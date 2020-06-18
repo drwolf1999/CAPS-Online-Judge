@@ -1,0 +1,2 @@
+- ignore last character when judge for line
+- ignore last new line what user printed
