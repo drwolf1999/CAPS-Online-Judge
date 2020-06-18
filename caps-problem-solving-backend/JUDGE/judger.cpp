@@ -16,8 +16,6 @@ void ERROR_LOG(const char * log_info) {
 
 // args[0] : this, args[1] : answer result file, args[2] : user result file
 int main(int argc, const char * args[]) {
-    
-    return 0;
     //------------------------ Preprocessing -----------------------//
     if (argc != 3) {
         ERROR_LOG("Arguments error! Must have 3 arguments!");
