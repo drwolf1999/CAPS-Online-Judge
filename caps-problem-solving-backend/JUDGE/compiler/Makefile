@@ -1,10 +1,10 @@
 GPP = g++
-CFLAGS = -O3
+CFLAGS = -O3 --std=c++17
 
 # generate runfile
 
 compiler: c.o cplusplus.o compiler.o
-	$(GPP) $(CFLAGS) -o execute.exe c.o cplusplus.o compiler.o
+	$(GPP) $(CFLAGS) -o execute.out c.o cplusplus.o compiler.o
 
 # generate object file
 
@@ -31,4 +31,4 @@ interface.o: include/compiler_interface.h
 
 # clean object, executer files
 clean:
-	rm *.o *.exe
+	rm *.o *.out

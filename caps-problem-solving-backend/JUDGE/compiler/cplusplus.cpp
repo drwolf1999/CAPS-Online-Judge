@@ -57,19 +57,41 @@ void CPP_COMPILER::COMPILER::GetResult() {
     //
 }
 #else
-void CPP_COMPILER::COMPILER::DoCompile() {
-    //
+void CPP_COMPILER::DoCompile() {
+    using namespace std;
+    vector<string> commandList = vector<string>({
+        "g++",                                                              // GCC
+        DIR + RUN + GetTarget(),                                            // Target file
+        "-o",                                                               // Execute Mode
+        DIR + RUN + GetExecutableFile(),                                    // Execute file
+        "-DNDEBUG -O2 -Wall -w -lm -static -std=c++14",                        // Compile Flag
+    });
+    string COMMAND;
+    Utility::ConnectStringList(COMMAND, commandList);
+    system(COMMAND.c_str());
+    int cnt = 0;
+    while (!Utility::FileExist(DIR + GetExecutableFile())) {
+        cnt++;
+        sleep(0.25 * TOSECONDS);
+        if (cnt == 8) break; // 2 second --> error
+    }
 }
 
-void CPP_COMPILER::COMPILER::GetInputOutputFiles() {
-    //
+void CPP_COMPILER::GetInputOutputFiles() {
+    inputs = Utility::GetFilesByDirectory(DIR + DATA, ".in");
+    outputs = Utility::GetFilesByDirectory(DIR + DATA, ".out");
 }
 
-void CPP_COMPILER::COMPILER::DoRun() {
-    //
+void CPP_COMPILER::DoRun() {
+    using namespace std;
+    GetInputOutputFiles();
+    assert(inputs.size() == outputs.size());
+    for (size_t i = 0; i < inputs.size(); i++) {
+        assert(inputs[i].substr(0, inputs[i].size() - 3) == outputs[i].substr(0, outputs[i].size() - 4)); // check file name
+    }
 }
 
-void CPP_COMPILER::COMPILER::GetResult() {
+void CPP_COMPILER::GetResult() {
     //
 }
 #endif // __WINDOW__SYSTEM__
