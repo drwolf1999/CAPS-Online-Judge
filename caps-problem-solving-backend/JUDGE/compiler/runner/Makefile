@@ -5,7 +5,7 @@ JUDGER_OBJ = judger.o
 # generate runfile
 
 judger: FastIO.o $(JUDGER_OBJ)
-	$(GPP) $(CFLAGS) -o judger.exe FastIO.o $(JUDGER_OBJ)
+	$(GPP) $(CFLAGS) -o execute.exe FastIO.o $(JUDGER_OBJ)
 
 # generate object file
 

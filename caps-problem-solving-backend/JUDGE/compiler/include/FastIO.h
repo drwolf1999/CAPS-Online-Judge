@@ -13,10 +13,10 @@
 #endif // WINDOW
 
 class FastIO {
-    enum { M_SIZE = 4096 };             // BUFFER SIZE
+    enum { M_SIZE = 4 };             // BUFFER SIZE
 
     int __file__descriptor__;
-    char __buffer__[M_SIZE];
+    char __buffer__[M_SIZE + 1];
     char __stop__;                      // If the buffer is full, the NULL to stop reading goes here
     char *__ptr__;                      // Pointer to next byte in buffer to read
     ssize_t __buffer_length__;          // Length of data in buffer
@@ -24,7 +24,6 @@ class FastIO {
     bool __finish__;
 
     void __readToBuffer__();
-    bool __parseLine__(char *&ptr);
 
 public:
     FastIO(int fileDescriptor);
@@ -34,8 +33,7 @@ public:
     bool isFileFinish();
     bool isFinish();
 
-    bool getLine();
-    bool getLine(char *&line);
+    bool getChar(char &ch);
 
     static int fileOpen(int &fileDescription, const char * fileNameWithPath) {
         return fileDescription = open(fileNameWithPath, O_RDONLY);
