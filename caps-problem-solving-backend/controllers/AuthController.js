@@ -30,7 +30,7 @@ const AuthController = {
                         });
                     }
                     if (result) {
-                        const token = jwt.sign({username: user.username,}, Secret.JWT_TOKEN, {expiresIn: "1h"});
+                        const token = jwt.sign({username: user.username, user__id: user._id}, Secret.JWT_TOKEN, {expiresIn: "1h"});
                         return res.status(200)
                             .header('Access-Token', token)
                             .json({
