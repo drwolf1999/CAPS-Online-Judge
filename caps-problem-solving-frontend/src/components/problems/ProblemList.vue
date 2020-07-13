@@ -26,8 +26,7 @@
                         </tr>
                         <tr v-else v-for="(problem) in Problems" v-bind:key="problem.number">
                             <td>{{ problem.number }}</td>
-                            <td><a href="javascript:void(0)" @click="ProblemClick(problem.number)">{{ problem.name
-                                }}</a></td>
+                            <td><a href="javascript:void(0)" @click="ProblemClick(problem.number)">{{ problem.name }}</a></td>
                             <td>{{ problem.answers }}</td>
                             <td>{{ problem.submits }}</td>
                         </tr>
@@ -37,9 +36,9 @@
             </v-card>
         </v-col>
         <v-col cols="11">
-                <router-link :to="'/problem/create'">
-                    <Button v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Add Problem`"></Button>
-                </router-link>
+            <router-link :to="'/problem/create'">
+                <Button v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Add Problem`"></Button>
+            </router-link>
         </v-col>
     </v-row>
 </template>
@@ -84,14 +83,23 @@
             fetchProblemsCount() {
                 this.fetchingProblems = true;
                 ProblemService.GetCountOfProblems()
-                .then(response => {
-                    this.fetchingProblemsCount = false;
-                    this.ProblemCount = response.data.count;
-                })
+                    .then(response => {
+                        this.fetchingProblemsCount = false;
+                        this.ProblemCount = response.data.count;
+                    })
             },
             onChangeQuery(value) {
                 this.Query = value;
             },
+            ProblemClick(problemId) {
+                const NextDestination = '/problem/view/' + problemId;
+                this.$router.push(NextDestination);
+            },
+        },
+        watch: {
+            '$route.query'() {
+                this.fetchProblems();
+            }
         },
         components: {
             Input,

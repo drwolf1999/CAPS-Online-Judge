@@ -13,6 +13,7 @@
         },
         props: {
             content: {type: String, default: 'Button',},
+            objContent: {type: Object, default: null,},
             Color: {type: String, default: 'normal',},
             textBtn: {type: Boolean, default: false,},
             block: {type: Boolean, default: false,},
