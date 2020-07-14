@@ -6,6 +6,7 @@
             <v-spacer></v-spacer>
             <Button v-bind:content="`문제`" v-bind:textBtn="true" v-on:click.native="goProblem"></Button>
             <Button v-bind:content="`채점 현황`" v-bind:textBtn="true" v-on:click.native="goStatus"></Button>
+            <Button v-bind:content="`순위`" v-bind:textBtn="true" v-on:click.native="goRank"></Button>
         </v-toolbar>
     </v-card>
 </template>
@@ -24,7 +25,10 @@
             },
             goStatus() {
                 this.$router.push('/status');
-            }
+            },
+            goRank() {
+                this.$router.push('/rank');
+            },
         },
         components: {
             Button,

@@ -7,6 +7,7 @@ import ProblemView from '@/components/problems/ProblemView';
 import Status from '@/components/status/Status';
 import Auth from '@/components/auth/Auth';
 import store from '../store/store.js';
+import Ranking from "@/components/ranking/Ranking";
 
 Vue.use(Router);
 
@@ -63,7 +64,14 @@ const router = new Router({
             name: 'Status',
             component: Status,
             beforeEnter: requireAuth(),
-        }
+        },
+        // Rank
+        {
+            path: '/rank',
+            name: 'Rank',
+            component: Ranking,
+            beforeEnter: requireAuth(),
+        },
     ]
 });
 
