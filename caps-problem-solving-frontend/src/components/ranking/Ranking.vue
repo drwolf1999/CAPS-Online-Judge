@@ -16,17 +16,14 @@
                             <th class="text-center" v-for="(problem, index) in Problems" v-bind:key="problem.number">
                                 <a style="text-decoration:none;" href="javascript:void(0);" @click="goProblem(problem)">{{ index }}</a>
                             </th>
-                            <th class="text-center">제출 수</th>
-                            <th class="text-center">맞은 문제 수</th>
                             <th class="text-center">페널티</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="(user, index) in Users" v-bind:key="user.number">
                             <td>{{ index + 1 }}</td>
-                            <td><a href="javascript:void(0)" @click="UserClick(user.number)">{{ user.name }}</a></td>
-                            <td>{{ user.answers }}</td>
-                            <td>{{ user.submits }}</td>
+                            <td>{{ user.name }}</td>
+                            <td v-for="problem in GetAcceptProblem(user.problem)" v-bind:key="problem"></td>
                         </tr>
                         </tbody>
                     </template>
