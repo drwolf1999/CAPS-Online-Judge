@@ -17,10 +17,15 @@ export default {
             });
     },
     CreateProblem(Data) {
-        return axios.post(RestAPI.SERVER_DOMAIN, Data)
-            .catch(error => {
-                console.log(error);
-            });
+        return new Promise((resolve, reject) => {
+            axios.post(RestAPI.SERVER_DOMAIN + 'problem/create', Data)
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
     },
     // DoLogin(data) {
     //     return axios.post(RestAPI.SERVER_DOMAIN + 'auth/login', data)

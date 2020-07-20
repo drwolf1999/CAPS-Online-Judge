@@ -8,6 +8,10 @@ const mongoose = require('mongoose');
  *
  * */
 
+function parseJSON(value) {
+    return JSON.parse(value);
+}
+
 let ProblemSchema = new mongoose.Schema({
     number: {
         type: Number,
@@ -15,13 +19,36 @@ let ProblemSchema = new mongoose.Schema({
     },
     name: {
         type: String,
+        required: true,
+        default: '',
     },
-    description: String,
+    memory_limit: {
+        type: Number,
+        required: true,
+        default: 128000000,
+        get: (value) => { return value / 1000.0 / 1000.0; }
+    },
+    time_limit: {
+        type: Number,
+        required: true,
+        default: 1000,
+        get: (value) => { return value / 1000.0; }
+    },
+    description: {
+        type: String,
+        get: parseJSON,
+    },
     input: {
         type: String,
+        required: true,
+        default: '',
+        get: parseJSON,
     },
     output: {
         type: String,
+        required: true,
+        default: '',
+        get: parseJSON,
     },
     examples: {
         type: [{input: String, output: String}],
@@ -29,16 +56,18 @@ let ProblemSchema = new mongoose.Schema({
     },
     answers: {
         type: Number,
+        required: true,
         default: 0,
     },
     submits: {
         type: Number,
+        required: true,
         default: 0,
     }
-});
+}, {toJSON: {getters: true}});
 
-ProblemSchema.statics.getProblem = function (ProblemId) {
-    return this.findById(ProblemId)
+ProblemSchema.statics.getProblem = function (problemNumber) {
+    return this.findOne({number: problemNumber})
         .exec();
 };
 

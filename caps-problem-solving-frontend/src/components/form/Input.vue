@@ -7,14 +7,14 @@
         name: 'Input',
         data() {
             return {
-                InputData: this.v_model,
+                InputData: this.model,
                 Label: this.label === undefined ? '' : this.label,
                 Readonly: !(this.readonly === undefined || this.readonly === false),
             };
         },
         props: {
             label: String,
-            v_model: String,
+            model: String,
             readonly: {type: Boolean, default: false},
         },
         methods: {

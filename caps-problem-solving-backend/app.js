@@ -1,10 +1,13 @@
 const express = require('express');
 const path = require('path');
+const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 const constantsSecret = require('./constants/Secret.js');
+
+require('./middleware/passport/passport')(passport);
 
 /**
  * DB 설정
@@ -42,6 +45,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // CORS handling
 // 브라우저 보안 문제.
