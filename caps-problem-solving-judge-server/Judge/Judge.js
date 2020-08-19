@@ -71,7 +71,7 @@ async function Update(now, msg) {
     }
 }
 
-async function main() {
+async function getJudgeResult() {
     let ret = {
         'result': 0,
         'time': 0.0,
@@ -87,7 +87,5 @@ async function main() {
         ret.time = Math.max(ret.time, result['testcases'][i].time);
         ret.memory = Math.max(ret.memory, result['testcases'][i].memory);
     }
-    console.log(ret);
+    return ret;
 }
-
-main();
