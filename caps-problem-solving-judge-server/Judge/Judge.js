@@ -1,4 +1,5 @@
 const exec = require('child_process').exec;
+const PATH = '';
 class RESULTTYPE {
     constructor(x, y) {
         this.real = x;

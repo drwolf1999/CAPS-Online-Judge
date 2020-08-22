@@ -25,10 +25,10 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(constantsSecret.dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    // auth: {
-    //     user: constantsSecret.user,
-    //     password: constantsSecret.pwd,
-    // }
+    auth: {
+        user: constantsSecret.user,
+        password: constantsSecret.pwd,
+    }
 })
     .then(() => {
         console.log('Connected to mongod Server Successfully');

@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
  * Submit Number
  * Submit User
  * About Problem
- * result (Wa, OK, CE, RE, MLE, TLE, JUDGING, WAIT)
+ * result (WA, OK, CE, RE, MLE, TLE, JUDGING, WAIT)
  * Used Memory (KB)
  * Used Time (MS)
  * Used Language
@@ -35,7 +35,7 @@ let StatusSchema = new mongoose.Schema({
     judge_result: {
         type: Number,
         required: true,
-        default: 6,
+        default: 7,
     },
     memory: {
         type: Number,
