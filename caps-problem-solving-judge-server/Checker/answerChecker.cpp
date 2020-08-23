@@ -4,7 +4,6 @@
 #include <fstream>
 #define DEBUG_MODE true
 #ifdef DEBUG_MODE
-#include <string>
 #include <iostream>
 #include <vector>
 #endif // DEBUG_MODE
@@ -22,7 +21,8 @@ enum JUDGE_RESULT {
 
 void ERROR_LOG(const char * log_info) {
     using namespace std;
-    const string LOG_FILE_DIR = "E:/programing/caps/caps-problem-solving-backend/JUDGE/";
+//    const string LOG_FILE_DIR = "E:/programing/caps/caps-problem-solving-backend/JUDGE/";
+    const string LOG_FILE_DIR = "/data/log/";
     ofstream log_file((LOG_FILE_DIR + "error.log").c_str(), ofstream::out | ofstream::app);
     if (DEBUG_MODE) {
         log_file << log_info << '\n';
@@ -37,9 +37,9 @@ bool AllowChecker(const char &ch, const std::vector<char> allowList) {
     return false;
 }
 
-int Judger(const std::string answerResultFile, const std::string userResultFile) {
+void Judger(const std::string answerResultFile, const std::string userResultFile) {
     //------------------------ Preprocessing -----------------------//
-    const std::string JUDGE_FILE_DIR = "E:/programing/caps/caps-problem-solving-backend/JUDGE/";
+    //    const std::string JUDGE_FILE_DIR = "E:/programing/caps/caps-problem-solving-backend/JUDGE/";
     int ans_fd, user_fd;
     if (FastIO::fileOpen(ans_fd, answerResultFile.c_str()) == -1) {
         ERROR_LOG("Failed open Answer File");
@@ -99,8 +99,14 @@ int Judger(const std::string answerResultFile, const std::string userResultFile)
     }
     close(ans_fd);
     close(user_fd);
-    return ret;
+//    return ret;
 }
 
-int main(int arc, char * args[]) {
+int main(int argc, char * args[]) {
+    if (argc != 3) {
+        std::cout << "ERROR";
+        return 0;
+    }
+    Judger(std::string(args[0]), std::string(args[1]));
+    return 0;
 }

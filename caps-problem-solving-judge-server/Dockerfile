@@ -57,6 +57,10 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN mkdir /judge
+RUN mv /usr/src/app/Checker/* /judge
+RUN make -C /judge/ all
+
 EXPOSE 3000
 
 CMD ["npm", "start"]

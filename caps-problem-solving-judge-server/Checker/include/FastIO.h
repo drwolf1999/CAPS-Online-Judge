@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <string>
 //#define WINDOW // If this file is on the server, comment this line
 #ifdef WINDOW
 #ifndef ssize_t

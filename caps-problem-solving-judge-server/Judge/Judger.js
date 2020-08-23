@@ -3,8 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const TC_PATH = '/data/testcase/';
 const WORK_PATH = '/data/target/';
-const USER_PATH = '/data/target/output/';
+const USER_OUTPUT = '/data/target/output/';
 const LOG_PATH = '/data/log/';
+const ANSWER_CHECKER = '/judge/answerChecker.o';
 
 class RESULTTYPE {
     constructor(x, y) {
@@ -54,7 +55,7 @@ const JudgerHelper = {
         judger += ' --max_memory=' + (memory_limit * 1000 * 1000); // byte to mb
         judger += ' --exe_path=' + FILE;
         judger += ' --input_path=' + input;
-        judger += ' --output_path=' + USER_PATH + 'user.out';
+        judger += ' --output_path=' + USER_OUTPUT;
         judger += ' --error_path=' + LOG_PATH + 'log.log';
         judger += ' --uid=0 --gid=0';
         let cmd = judger;//'runuser -l ljudge -c ' + ljudge;
@@ -66,8 +67,26 @@ const JudgerHelper = {
                 console.log(error);
             });
     },
-    Update: async (now, msg) => {
-        //
+    Update: async (now, msg, answerOUTPUT) => {
+        switch (msg) {
+            case 0:
+                let checker = await ShellHelper.sh(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
+                if (checker.stdout === 'WA') {
+                    return 0;
+                }
+                return 1;
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                return msg;
+                break;
+            case 5:
+                return 8;
+                break;
+        }
+        return -1;
     },
 };
 module.exports = JudgerHelper;
@@ -142,21 +161,11 @@ const Judger = {
                 }
                 let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
                 ret.result = JudgerHelper.Update(ret.result, result.result);
-                if (ret.result !== 0 && ret.result !== 1) return ret;
+                if (ret.result !== 1) return ret;
                 ret.time = Math.max(ret.time, result.cpu_time);
                 ret.memory = Math.max(ret.time, result.memory);
             }
         });
-        // let result = JSON.parse(await JudgerHelper.judge(FILE, status_info.problem));
-        // if (result['success'] === false) {
-        //     ret.result = RESULT.CE.real;
-        //     return ret;
-        // }
-        // for (let i = 0; i < result['testcases'].length; i++) {
-        //     ret.result = JudgerHelper.Update(ret.result, result['testcases'][i].result);
-        //     ret.time = Math.max(ret.time, result['testcases'][i].time);
-        //     ret.memory = Math.max(ret.memory, result['testcases'][i].memory);
-        // }
         return ret;
     },
 };
