@@ -4,6 +4,7 @@ const router = express.Router();
 const problemRouter = require('./problem');
 const statusRouter = require('./status');
 const authRouter = require('./auth');
+const judgeRouter = require('./forJudge');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -16,5 +17,6 @@ router.get('/', function(req, res, next) {
 router.use('/problem', problemRouter);
 router.use('/status', statusRouter);
 router.use('/auth', authRouter);
+router.use('/for/judgement/secure', judgeRouter);
 
 module.exports = router;

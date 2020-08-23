@@ -1,6 +1,7 @@
 const Status = require('../models/Status');
 
 const StatusController = {
+    /// Original
     All: (req, res, next) => {
         console.log(req.params.page);
         Status.getAllStatus(req.params.page)
@@ -58,6 +59,37 @@ const StatusController = {
                     message: 'fail',
                 });
             });
+    },
+    /////// for judgement
+    GetInQueue: (req, res, next) => {
+        console.log('init');
+        Status.find()
+            .where('judge_result').equals('7')
+            .sort('-submit_time')
+            .populate('problem')
+            .limit(1)
+            .then(status => {
+                console.log('judge ret status : ' + status);
+                if (Object.keys(status).length === 0) {
+                    return res.status(200).json({
+                        status: {},
+                    });
+                } else {
+                    return res.status(200).json({
+                        status: status,
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                return res.status(500).json({
+                    error: error,
+                    message: 'error',
+                });
+            });
+    },
+    UpdateResult: (req, res, next) => {
+        //
     },
 };
 
