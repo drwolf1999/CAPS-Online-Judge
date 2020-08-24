@@ -1,5 +1,5 @@
 module.exports = {
-    dbUrl: 'mongodb://localhost:27017/CapsOj',
-    user: 'root',
+    dbUrl: 'mongodb://caps_oj_mongo_server:27017/CapsOj',
+    user: 'dev',
     pwd: '5445wolf'
 };

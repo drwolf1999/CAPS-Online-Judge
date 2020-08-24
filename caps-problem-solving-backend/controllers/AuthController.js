@@ -11,6 +11,7 @@ const AuthController = {
             .then(function (data) {
                 res.render('auth/login', LayoutArg);
             });
+        next();
     },
     DoLogin: (req, res, next) => {
         console.log(req.body.username + ' ' + req.body.password);
@@ -37,7 +38,7 @@ const AuthController = {
                                 message: 'Auth Successful',
                             });
                     }
-                    res.status(401).json({
+                    return res.status(401).json({
                         message: 'Auth Failed',
                     });
                 });
@@ -47,9 +48,11 @@ const AuthController = {
         req.logout();
         req.flash('logout success!!');
         res.redirect('/auth/login');
+        next();
     },
     Register: (req, res, next) => {
         res.render('auth/register', LayoutArg);
+        next();
     },
     DoRegister: (req, res, next) => {
         bcrypt.genSalt(10, (error, salt) => {
@@ -79,7 +82,7 @@ const AuthController = {
                         });
                 }
             })
-        })
+        });
     },
 };
 

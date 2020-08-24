@@ -1,0 +1,19 @@
+{
+  "name": "caps-problem-solving-judge-server",
+  "version": "1.0.0",
+  "description": "judge server for caps oj",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./bin/www"
+  },
+  "author": "doyeop kim",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.0",
+    "morgan": "^1.10.0"
+  }
+}
