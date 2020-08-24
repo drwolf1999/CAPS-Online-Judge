@@ -2,3 +2,4 @@ node_module/*
 public/*
 views/*
 data/*
+.idea

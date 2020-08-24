@@ -27,7 +27,7 @@ services:
     restart: always
     build: ./caps-problem-solving-frontend
     volumes:
-      - /home/judge/testcase:/data/testcase
+      - /Users/doyeopkim/data/testcase:/data/testcase
     ports:
       - "8080:80"
     depends_on:
@@ -39,7 +39,7 @@ services:
     restart: always
     build: ./caps-problem-solving-judge-server
     volumes:
-    - /home/judge/testcase:/data/testcase
+    - /Users/doyeopkim/data/testcase:/data/testcase
     - /sys/fs/cgroup:/sys/fs/cgroup:rw
     depends_on:
       - caps_oj_backend
