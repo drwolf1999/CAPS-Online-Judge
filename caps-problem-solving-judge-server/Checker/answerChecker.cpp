@@ -99,7 +99,6 @@ void Judger(const std::string answerResultFile, const std::string userResultFile
     }
     close(ans_fd);
     close(user_fd);
-//    return ret;
 }
 
 int main(int argc, char * args[]) {
@@ -107,6 +106,6 @@ int main(int argc, char * args[]) {
         std::cout << "ERROR";
         return 0;
     }
-    Judger(std::string(args[0]), std::string(args[1]));
+    Judger(std::string(args[1]), std::string(args[2]));
     return 0;
 }

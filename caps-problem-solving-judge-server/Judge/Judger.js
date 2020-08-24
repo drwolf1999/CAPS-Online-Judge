@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const TC_PATH = '/data/testcase/';
 const WORK_PATH = '/data/target/';
-const USER_OUTPUT = '/data/target/output/';
+const USER_OUTPUT = '/data/target/output/user.out';
 const LOG_PATH = '/data/log/';
 const ANSWER_CHECKER = '/judge/answerChecker.o';
 
@@ -13,6 +13,7 @@ class RESULTTYPE {
         this.priority = y;
     }
 }
+
 //WA, OK, CE, RE, MLE, TLE, JUDGING, WAIT
 const RESULT = {
     'WA': new RESULTTYPE(0, 2),
@@ -39,7 +40,7 @@ const ShellHelper = {
                 if (err) {
                     reject(err);
                 } else {
-                    // console.log('TT ' + cmd);
+                    console.log('TT ' + cmd + ' ' + stderr + ' ' + stdout);
                     return resolve({stdout, stderr});
                 }
             });
@@ -70,7 +71,9 @@ const JudgerHelper = {
     Update: async (now, msg, answerOUTPUT) => {
         switch (msg) {
             case 0:
+                console.log(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
                 let checker = await ShellHelper.sh(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
+                console.log('checker : ' + JSON.stringify(checker));
                 if (checker.stdout === 'WA') {
                     return 0;
                 }
@@ -125,47 +128,47 @@ const Judger = {
         }
         fs.writeFileSync(FILE, user_code, {encoding: 'utf-8'});
         compile_log = await ShellHelper.sh(cmd);
-        console.log(OBJ);
-        console.log(fs.existsSync(OBJ) + compile_log);
+        // console.log(OBJ);
+        // console.log(fs.existsSync(OBJ) + compile_log);
         if (!fs.existsSync(OBJ) || compile_log['stdout'].length !== 0) {
             ret.result = 2;
             return ret;
         }
+        await ShellHelper.sh('chmod +x ' + OBJ);
         if (language === 2) {
             await ShellHelper.sh('mv ' + WORK_PATH + 'dist/Main.3 ' + OBJ); // move
         }
-        fs.readdir(TC_PATH + status_info.problem.number, async (error, files) => {
-            if (error) throw error;
-            const working_dir = TC_PATH + status_info.problem.number + '/';
-            let inputs = [], outputs = [];
-            console.log(files);
-            files.forEach(file => {
-                if (file.indexOf('.in') > 0) {
-                    inputs.push(working_dir + file);
-                } else if (file.indexOf('.out') > 0) {
-                    outputs.push(working_dir + file);
-                }
-            });
-            inputs.sort();
-            outputs.sort();
-            let i = 0, o = 0;
-            while (i < inputs.length && o < outputs.length) {
-                const ii = inputs[i].replace('.in', '');
-                const oo = outputs[o].replace('.out', '');
-                if (ii < oo) {
-                    i++;
-                    continue;
-                } else if (ii > oo) {
-                    o++;
-                    continue;
-                }
-                let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
-                ret.result = JudgerHelper.Update(ret.result, result.result);
-                if (ret.result !== 1) return ret;
-                ret.time = Math.max(ret.time, result.cpu_time);
-                ret.memory = Math.max(ret.time, result.memory);
+        let files = await fs.readdirSync(TC_PATH + status_info.problem.number);
+        const working_dir = TC_PATH + status_info.problem.number + '/';
+        let inputs = [], outputs = [];
+        // console.log(files);
+        files.forEach(file => {
+            if (file.indexOf('.in') > 0) {
+                inputs.push(working_dir + file);
+            } else if (file.indexOf('.out') > 0) {
+                outputs.push(working_dir + file);
             }
         });
+        inputs.sort();
+        outputs.sort();
+        let i = 0, o = 0;
+        while (i < inputs.length && o < outputs.length) {
+            const ii = inputs[i].replace('.in', '');
+            const oo = outputs[o].replace('.out', '');
+            if (ii < oo) {
+                i++;
+                continue;
+            } else if (ii > oo) {
+                o++;
+                continue;
+            }
+            let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
+            console.log(result);
+            ret.result = await JudgerHelper.Update(ret.result, result.result, outputs[o]);
+            if (ret.result !== 1) return ret;
+            ret.time = Math.max(ret.time, result.cpu_time);
+            ret.memory = Math.max(ret.time, result.memory);
+        }
         return ret;
     },
 };

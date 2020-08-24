@@ -57,6 +57,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN mkdir -p /data/target/output
 RUN mkdir /judge
 RUN mv /usr/src/app/Checker/* /judge
 RUN make -C /judge/ all
