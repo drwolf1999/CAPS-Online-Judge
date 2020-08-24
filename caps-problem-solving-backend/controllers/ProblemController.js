@@ -51,8 +51,8 @@ const ProblemController = {
         let examples = [], example_string = JSON.parse(req.body.examples);
         for (let i = 0; i < example_string.length; i++) {
             examples.push({
-                input: JSON.stringify(example_string[i].input),
-                output: JSON.stringify(example_string[i].output),
+                input: example_string[i].input,
+                output: example_string[i].output,
             });
         }
         let problem = new Problem({
