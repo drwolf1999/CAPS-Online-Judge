@@ -28,6 +28,7 @@ const MainController = {
             const queue_front = await JudgeController.GetInQueue();
             if (queue_front !== false) {
                 await JudgeController.UpdateSubmission(queue_front);
+                await Utility.sleep(1000);
             } else {
                 await Utility.sleep(1000);
             }

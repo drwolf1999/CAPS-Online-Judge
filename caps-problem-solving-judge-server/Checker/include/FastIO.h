@@ -14,7 +14,7 @@
 #endif // WINDOW
 
 class FastIO {
-    enum { M_SIZE = 4 };             // BUFFER SIZE
+    enum { M_SIZE = 2048 };             // BUFFER SIZE
 
     int __file__descriptor__;
     char __buffer__[M_SIZE + 1];

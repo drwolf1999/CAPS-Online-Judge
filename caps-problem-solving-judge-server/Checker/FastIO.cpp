@@ -38,6 +38,7 @@ bool FastIO::isFinish() { return __finish__; };
 
 bool FastIO::getChar(char &ch) {
     if (*__ptr__ == 0) {
+        if (__file__finish__) return false;
         __readToBuffer__();
         if (*__ptr__ == 0) return false;
     }

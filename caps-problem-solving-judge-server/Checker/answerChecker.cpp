@@ -54,7 +54,7 @@ void Judger(const std::string answerResultFile, const std::string userResultFile
     FastIO ans_io(ans_fd), user_io(user_fd);
     int ret = JUDGE_RESULT::CORRECT;
     std::string ans, user;
-    register char ans_char, user_char;
+    char ans_char, user_char;
     bool ans_chk = true, user_chk = true;
     while (ans_chk || user_chk) {
         ans_chk = ans_io.getChar(ans_char);
@@ -89,6 +89,8 @@ void Judger(const std::string answerResultFile, const std::string userResultFile
         }
         ans.push_back(ans_char);
         user.push_back(user_char);
+        ans_char = -1;
+        user_char = -1;
         if (ret == JUDGE_RESULT::WRONG_ANSWER) break; // Avoid meaningless operations
     }
     //------------------------ End Judging -----------------------------//

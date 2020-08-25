@@ -40,7 +40,7 @@ const ShellHelper = {
                 if (err) {
                     reject(err);
                 } else {
-                    console.log('TT ' + cmd + ' ' + stderr + ' ' + stdout);
+                    // console.log('TT ' + cmd + ' ' + stderr + ' ' + stdout);
                     return resolve({stdout, stderr});
                 }
             });
@@ -71,9 +71,10 @@ const JudgerHelper = {
     Update: async (now, msg, answerOUTPUT) => {
         switch (msg) {
             case 0:
-                console.log(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
+                // console.log(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
+                // console.log((await ShellHelper.sh('cat ' + answerOUTPUT)).stdout + ' ' + (await ShellHelper.sh('cat ' + USER_OUTPUT)).stdout);
                 let checker = await ShellHelper.sh(ANSWER_CHECKER + ' ' + answerOUTPUT + ' ' + USER_OUTPUT);
-                console.log('checker : ' + JSON.stringify(checker));
+                // console.log('checker : ' + JSON.stringify(checker));
                 if (checker.stdout === 'WA') {
                     return 0;
                 }
@@ -163,11 +164,13 @@ const Judger = {
                 continue;
             }
             let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
-            console.log(result);
+            // console.log(result);
             ret.result = await JudgerHelper.Update(ret.result, result.result, outputs[o]);
             if (ret.result !== 1) return ret;
             ret.time = Math.max(ret.time, result.cpu_time);
             ret.memory = Math.max(ret.time, result.memory);
+            i++;
+            o++;
         }
         return ret;
     },
