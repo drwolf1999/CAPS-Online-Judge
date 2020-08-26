@@ -21,7 +21,7 @@ const router = new Router({
     routes: [
         {
             path: '/',
-            name: 'CAPS OJ',
+            name: 'CAPS_OJ',
             component: Home,
             beforeEnter: requireAuth(),
         },
@@ -34,26 +34,26 @@ const router = new Router({
         // Problem
         {
             path: '/problem',
-            name: 'Problem List',
+            name: 'ProblemList',
             component: ProblemList,
             beforeEnter: requireAuth(),
         },
         {
             path: '/problem/create',
-            name: 'Create Problem',
+            name: 'CreateProblem',
             component: ProblemForm,
             beforeEnter: requireAuth(),
         },
         {
             path: '/problem/view/:problemNumber',
-            name: 'Problem View',
+            name: 'ProblemView',
             component: ProblemView,
             props: true,
             beforeEnter: requireAuth(),
         },
         {
             path: '/problem/modify/:problemNumber',
-            name: 'Problem Modify',
+            name: 'ProblemModify',
             component: ProblemForm,
             props: true,
             beforeEnter: requireAuth(),

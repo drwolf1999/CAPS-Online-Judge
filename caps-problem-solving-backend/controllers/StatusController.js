@@ -1,96 +1,128 @@
 const Status = require('../models/Status');
+const Problem = require('../models/Problem');
 
 const StatusController = {
-    /// Original
-    All: (req, res, next) => {
-        console.log(req.params.page);
-        Status.getAllStatus(req.params.page)
-            .then(Status => {
-                res.status(200).json({
-                    Status: Status,
-                    message: 'success',
+        /// Original
+        All: (req, res, next) => {
+            console.log(req.params.page);
+            Status.getAllStatus(req.params.page)
+                .then(Status => {
+                    res.status(200).json({
+                        Status: Status,
+                        message: 'success',
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                    res.status(500).json({
+                        error: error,
+                        message: 'fail',
+                    });
+                })
+        },
+        Get: (req, res, next) => {
+            Status.getStatus(req.params.submitNumber)
+                .then(statusData => {
+                    res.status(200).json({
+                        Problem: statusData,
+                        message: 'success',
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                    res.status(500).json({
+                        error: error,
+                        message: 'fail',
+                    });
+                })
+        },
+        Create: async (req, res, next) => {
+            try {
+                const problem = await Problem.findById(req.body.problem).exec();
+                if (problem === null || problem === undefined)
+                    return res.status(404).json({
+                        status: null,
+                        message: 'forbidden',
+                    });
+                let status = new Status({
+                    user: req.body.user,
+                    problem: req.body.problem,
+                    code: req.body.code,
+                    language: req.body.language,
                 });
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(500).json({
-                    error: error,
-                    message: 'fail',
+                status = await status.save();
+                await Problem.findOneAndUpdate({number: status.problem.number}, {
+                    $inc: {
+                        submits: 1,
+                    }
                 });
-            })
-    },
-    Get: (req, res, next) => {
-        Status.getStatus(req.params.submitNumber)
-            .then(statusData => {
-                res.status(200).json({
-                    Problem: statusData,
-                    message: 'success',
-                });
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(500).json({
-                    error: error,
-                    message: 'fail',
-                });
-            })
-    },
-    Create: (req, res, next) => {
-        console.log(req.body.user);
-        console.log(req.body.problem);
-        let status = new Status({
-            user: req.body.user,
-            problem: req.body.problem,
-            code: req.body.code,
-            language: req.body.language,
-        });
-        status.save()
-            .then(status => {
-                console.log(status);
-                res.status(200).json({
+                return res.status(200).json({
                     Status: status,
                     message: 'success',
                 });
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(500).json({
-                    error: error,
-                    message: 'fail',
-                });
-            });
-    },
-    /////// for judgement
-    GetInQueue: (req, res, next) => {
-        console.log('init');
-        Status.find()
-            .where('judge_result').equals('7')
-            .sort('-submit_time')
-            .populate('problem')
-            .limit(1)
-            .then(status => {
-                console.log('judge ret status : ' + status);
-                if (Object.keys(status).length === 0) {
-                    return res.status(200).json({
-                        status: {},
-                    });
-                } else {
-                    return res.status(200).json({
-                        status: status,
-                    });
-                }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.log(error);
                 return res.status(500).json({
                     error: error,
                     message: 'error',
                 });
-            });
-    },
-    UpdateResult: (req, res, next) => {
-        //
-    },
-};
+            }
+        },
+        /////// for judgement
+        GetInQueue: (req, res, next) => {
+            Status.find()
+                .where('judge_result').equals('7')
+                .sort('-submit_time')
+                .populate('problem')
+                .limit(1)
+                .then(status => {
+                    console.log('judge ret status : ' + status);
+                    if (Object.keys(status).length === 0) {
+                        return res.status(200).json({
+                            status: {},
+                        });
+                    } else {
+                        return res.status(200).json({
+                            status: status,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    return res.status(500).json({
+                        error: error,
+                        message: 'error',
+                    });
+                });
+        },
+        UpdateResult: async (req, res, next) => {
+            const submitNumber = req.body.number;
+            try {
+                const result = await Status.findOneAndUpdate({number: submitNumber}, {
+                    $set: {
+                        judge_result: req.body.judge_result,
+                        time: req.body.time,
+                        memory: req.body.memory,
+                    }
+                }, {returnNewDocument: true})
+                    .populate('problem')
+                    .exec();
+                if (result === null || result === undefined)
+                    res.status(404).json({
+                        message: 'forbidden',
+                    });
+                if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}});
+                res.status(200).json({
+                    result: result,
+                });
+            } catch (error) {
+                res.status(500).json({
+                    error: error,
+                });
+                throw error;
+            }
+        },
+    }
+;
 
 module.exports = StatusController;

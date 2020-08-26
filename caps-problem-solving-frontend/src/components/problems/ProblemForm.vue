@@ -117,13 +117,13 @@
                     output: JSON.stringify(this.Problem.output),
                     examples: JSON.stringify(this.Problem.examples),
                 })
-                    .then(response => {
+                    .then((response) => {
                         this.$notify({
                             title: '문제 등록이 완료되었습니다.',
                             text: '문제 페이지로 이동합니다.',
                             type: 'success',
                         });
-                        this.$router.push('/problem/view/' + response.data.Problem.number);
+                        this.$router.push({name: 'ProblemView', params: {problemNumber: response.Problem.number}});
                     })
                     .catch(error => {
                         console.log(error);

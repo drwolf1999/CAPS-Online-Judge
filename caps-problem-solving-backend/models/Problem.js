@@ -26,13 +26,17 @@ let ProblemSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: 128000000,
-        get: (value) => { return value / 1000.0 / 1000.0; }
+        get: (value) => {
+            return value / 1000.0 / 1000.0;
+        }
     },
     time_limit: {
         type: Number,
         required: true,
         default: 1000,
-        get: (value) => { return value / 1000.0; }
+        get: (value) => {
+            return value / 1000.0;
+        }
     },
     description: {
         type: String,

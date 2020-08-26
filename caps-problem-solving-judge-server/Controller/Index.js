@@ -16,7 +16,15 @@ const JudgeController = {
     },
     UpdateSubmission: async (data) => {
         let judgeResult = await Judger.getJudgeResult(data);
-        console.log(judgeResult);
+        new Promise((resolve, reject) => {
+            axios.post(RestAPI.SERVER_DOMAIN + RestAPI.JUDGE_ARG + 'updateResult', judgeResult)
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
     },
 };
 

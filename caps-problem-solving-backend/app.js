@@ -25,6 +25,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(constantsSecret.dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
     auth: {
         user: constantsSecret.user,
         password: constantsSecret.pwd,

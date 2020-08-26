@@ -39,12 +39,16 @@ const ShellHelper = {
             exec(cmd, (err, stdout, stderr) => {
                 if (err) {
                     reject(err);
+                    return err;
                 } else {
-                    // console.log('TT ' + cmd + ' ' + stderr + ' ' + stdout);
                     return resolve({stdout, stderr});
                 }
             });
-        });
+        })
+            .catch(error => {
+                console.log(error);
+                return false;
+            });
     },
 };
 const JudgerHelper = {
@@ -97,10 +101,12 @@ module.exports = JudgerHelper;
 
 const Judger = {
     getJudgeResult: async (status_info) => {
+        console.log(status_info);
         const language = status_info.language;
         const user_code = status_info.code;
         let ret = {
-            'result': 0,
+            'number': status_info.number,
+            'judge_result': 0,
             'time': 0.0,
             'memory': 0,
         };
@@ -131,8 +137,8 @@ const Judger = {
         compile_log = await ShellHelper.sh(cmd);
         // console.log(OBJ);
         // console.log(fs.existsSync(OBJ) + compile_log);
-        if (!fs.existsSync(OBJ) || compile_log['stdout'].length !== 0) {
-            ret.result = 2;
+        if (!fs.existsSync(OBJ) || !compile_log || compile_log['stdout'].length !== 0) {
+            ret.judge_result = 2;
             return ret;
         }
         await ShellHelper.sh('chmod +x ' + OBJ);
@@ -165,8 +171,8 @@ const Judger = {
             }
             let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
             // console.log(result);
-            ret.result = await JudgerHelper.Update(ret.result, result.result, outputs[o]);
-            if (ret.result !== 1) return ret;
+            ret.judge_result = await JudgerHelper.Update(ret.judge_result, result.result, outputs[o]);
+            if (ret.judge_result !== 1) break;
             ret.time = Math.max(ret.time, result.cpu_time);
             ret.memory = Math.max(ret.time, result.memory);
             i++;

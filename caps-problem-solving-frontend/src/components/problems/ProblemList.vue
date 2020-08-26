@@ -49,7 +49,7 @@
     import ProblemService from '@/service/problem.js';
 
     export default {
-        name: 'Problem List',
+        name: 'ProblemList',
         mounted() {
             this.fetchProblems();
             this.fetchProblemsCount();

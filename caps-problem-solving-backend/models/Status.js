@@ -74,8 +74,8 @@ StatusSchema.statics.getAllStatus = function (page) {
         .sort({'number': -1})
         .populate('user')
         .populate('problem')
-        .skip((page - 1) * 10)
-        .limit(10)
+        // .skip((page - 1) * 10)
+        // .limit(10)
         .exec();
 };
 
