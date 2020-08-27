@@ -5,6 +5,7 @@ import ProblemList from '@/components/problems/ProblemList.vue';
 import ProblemForm from '@/components/problems/ProblemForm';
 import ProblemView from '@/components/problems/ProblemView';
 import Status from '@/components/status/Status';
+import SubmitCode from '@/components/status/SubmissionCode';
 import Auth from '@/components/auth/Auth';
 import store from '../store/store.js';
 import Ranking from "@/components/ranking/Ranking";
@@ -63,6 +64,13 @@ const router = new Router({
             path: '/status',
             name: 'Status',
             component: Status,
+            beforeEnter: requireAuth(),
+        },
+        {
+            path: '/status/submission/:submitNumber',
+            name: 'SubmitCodeView',
+            component: SubmitCode,
+            props: true,
             beforeEnter: requireAuth(),
         },
         // Rank

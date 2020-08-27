@@ -14,7 +14,6 @@
                             <th class="text-center">메모리</th>
                             <th class="text-center">시간</th>
                             <th class="text-center">언어</th>
-                            <th class="text-center">코드 길이</th>
                             <th class="text-center">제출한 시간</th>
                         </tr>
                         </thead>
@@ -29,10 +28,9 @@
                             <td>{{ state.user.username }}</td>
                             <td>{{ state.problem.number }}</td>
                             <td v-bind:style="{color: Result[state.judge_result].color}">{{ Result[state.judge_result].name }}</td>
-                            <td>{{ state.memory }}</td>
-                            <td>{{ state.time }}</td>
-                            <td>{{ Language[state.language] }}</td>
-                            <td>{{ state.code_length }}</td>
+                            <td>{{ state.judge_result === 1 ? state.memory / 1024 : '' }}</td>
+                            <td>{{ state.judge_result === 1 ? state.time : '' }}</td>
+                            <td><a href="javascript:void(0);" @click="ViewCode(state.number)">{{ Language[state.language] }}</a></td>
                             <td>{{ state.submit_time | dateToString }}</td>
                         </tr>
                         </tbody>
@@ -44,51 +42,53 @@
 </template>
 
 <script>
-    import SubmitConstants from '@/helper/SubmitConstants';
-    import StatusService from '@/service/status';
-    import LanguageConstants from '@/helper/Language';
-    import Utility from '@/helper/Utility';
+import SubmitConstants from '@/helper/SubmitConstants';
+import StatusService from '@/service/status';
+import LanguageConstants from '@/helper/Language';
+import Utility from '@/helper/Utility';
 
-    export default {
-        name: 'Status',
-        mounted() {
-            this.fetchStatus();
-        },
-        data() {
-            return {
-                fetchingStatus: false,
-                page: 1,
-                Status: [
-                ],
-            };
-        },
-        methods: {
-            fetchStatus() {
-                this.Status.splice(0, this.Status.length);
-                StatusService.GetAllStatus(this.page)
+export default {
+    name: 'Status',
+    mounted() {
+        this.fetchStatus();
+    },
+    data() {
+        return {
+            fetchingStatus: false,
+            page: 1,
+            Status: [],
+        };
+    },
+    methods: {
+        fetchStatus() {
+            this.Status.splice(0, this.Status.length);
+            StatusService.GetAllStatus(this.page)
                 .then(response => {
                     this.Status = response.data.Status;
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            },
         },
-        computed: {
-            Result() {
-                return SubmitConstants.Result;
-            },
-            Language() {
-                return LanguageConstants.Language;
-            },
+        ViewCode(stateNumber) {
+            this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
         },
-        filters: {
-            dateToString: function (value) {
-                return Utility.convertDateToString(value);
-            },
-            doubleDigit: function (value) {
-                return Utility.TimeDigit1To2(value);
-            },
+    },
+    computed: {
+        Result() {
+            return SubmitConstants.Result;
         },
-    }
+        Language() {
+            return LanguageConstants.Language;
+        },
+    },
+    filters: {
+        dateToString: function (value) {
+            return Utility.convertDateToString(value);
+        },
+        doubleDigit: function (value) {
+            return Utility.TimeDigit1To2(value);
+        },
+    },
+}
 </script>

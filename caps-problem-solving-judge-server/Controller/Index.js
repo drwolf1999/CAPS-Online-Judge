@@ -9,9 +9,12 @@ const JudgeController = {
         let queue = await axios.get(RestAPI.SERVER_DOMAIN + RestAPI.JUDGE_ARG + 'getInQueue')
             .catch(error => {
                 console.log(error);
+                return false;
             });
         const ret = queue.data.status;
+        if (ret === null) return false;
         if (ret.length === 0) return false;
+        if (ret[0] === null) return false;
         return ret[0];
     },
     UpdateSubmission: async (data) => {

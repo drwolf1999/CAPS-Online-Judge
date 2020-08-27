@@ -21,10 +21,12 @@ const StatusController = {
                 })
         },
         Get: (req, res, next) => {
+            console.log(req.params.submitNumber);
             Status.getStatus(req.params.submitNumber)
-                .then(statusData => {
+                .then(status => {
+                    console.log(status);
                     res.status(200).json({
-                        Problem: statusData,
+                        Status: status,
                         message: 'success',
                     });
                 })
@@ -34,7 +36,7 @@ const StatusController = {
                         error: error,
                         message: 'fail',
                     });
-                })
+                });
         },
         Create: async (req, res, next) => {
             try {
@@ -77,9 +79,9 @@ const StatusController = {
                 .limit(1)
                 .then(status => {
                     console.log('judge ret status : ' + status);
-                    if (Object.keys(status).length === 0) {
+                    if (status === null || status === undefined || Object.keys(status).length === 0) {
                         return res.status(200).json({
-                            status: {},
+                            status: null,
                         });
                     } else {
                         return res.status(200).json({

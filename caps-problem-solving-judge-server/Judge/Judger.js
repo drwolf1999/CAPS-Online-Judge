@@ -116,13 +116,13 @@ const Judger = {
         let cmd;
         switch (language) {
             case 0:
-                FILE = FILE + '.cpp';
-                cmd = 'g++ -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=gnu++14 -DONLINE_JUDGE -DBOJ';
+                FILE = FILE + '.c';
+                cmd = 'gcc -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=c11 -DONLINE_JUDGE -DBOJ';
                 OBJ = OBJ + 'Main.o';
                 break;
             case 1:
-                FILE = FILE + '.c';
-                cmd = 'gcc -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=c11 -DONLINE_JUDGE -DBOJ';
+                FILE = FILE + '.cpp';
+                cmd = 'g++ -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=gnu++14 -DONLINE_JUDGE -DBOJ';
                 OBJ = OBJ + 'Main.o';
                 break;
             case 2:

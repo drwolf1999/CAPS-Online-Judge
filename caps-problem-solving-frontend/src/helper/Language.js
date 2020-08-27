@@ -1,6 +1,7 @@
 const Language = [
-    'C++',
     'C',
+    'C++',
+    'Python',
 ];
 
 module.exports = {
