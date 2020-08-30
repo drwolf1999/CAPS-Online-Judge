@@ -62,8 +62,14 @@
                     </v-row>
                 </v-form>
             </v-card>
-            <v-breadcrumbs></v-breadcrumbs>
+            <v-col></v-col>
+            <v-divider></v-divider>
             <ProblemSubmit v-bind:problem-id="Problem._id"></ProblemSubmit>
+            <v-col></v-col>
+            <v-spacer></v-spacer>
+            <router-link :to="'/problem/testcase/modify/' + Problem.number">
+                <Button v-bind:content="`testcase`" v-bind:color="`primary`" v-bind:block="true"></Button>
+            </router-link>
         </v-col>
         <v-col v-else>
             <v-sheet :color="`lighten-4`" class="px-10 pt-10 pb-10">
@@ -74,30 +80,31 @@
 </template>
 
 <script>
-    import EditorView from '@/components/form/EditorView';
-    import ProblemSubmit from '@/components/problems/ProblemSubmit';
+import EditorView from '@/components/form/EditorView';
+import ProblemSubmit from '@/components/problems/ProblemSubmit';
+import Button from "@/components/form/Button";
 
-    export default {
-        name: 'ProblemView',
-        data() {
-            return {
-                ProblemNumber: parseInt(this.problemNumber),
-            };
+export default {
+    name: 'ProblemView',
+    data() {
+        return {
+            ProblemNumber: parseInt(this.problemNumber),
+        };
+    },
+    props: ['problemNumber'],
+    mounted() {
+        this.$store.dispatch('fetchProblem', this.problemNumber);
+    },
+    computed: {
+        Problem() {
+            return this.$store.getters.getProblem;
         },
-        props: ['problemNumber'],
-        mounted() {
-            this.$store.dispatch('fetchProblem', this.problemNumber);
-        },
-        computed: {
-            Problem() {
-                return this.$store.getters.getProblem;
-            },
-        },
-        methods: {
-        },
-        components: {
-            ProblemSubmit,
-            EditorView,
-        }
+    },
+    methods: {},
+    components: {
+        Button,
+        ProblemSubmit,
+        EditorView,
     }
+}
 </script>

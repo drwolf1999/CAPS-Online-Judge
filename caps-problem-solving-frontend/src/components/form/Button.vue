@@ -1,5 +1,7 @@
 <template>
-    <v-btn :text="TextBtn" :color="color" :block="block">{{ content }}</v-btn>
+    <v-btn :text="TextBtn" :color="color" :block="block">{{ content }}
+    <v-icon v-if="icon">{{ icon }}</v-icon>
+    </v-btn>
 </template>
 
 <script>
@@ -17,6 +19,7 @@
             Color: {type: String, default: 'normal',},
             textBtn: {type: Boolean, default: false,},
             block: {type: Boolean, default: false,},
+            icon: {type: String, default: '',},
         },
         methods: {}
     };

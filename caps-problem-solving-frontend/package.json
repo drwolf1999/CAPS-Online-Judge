@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.10.2",
+    "@mdi/font": "^5.5.55",
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-router": "^4.4.1",

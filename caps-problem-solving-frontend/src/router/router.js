@@ -9,6 +9,7 @@ import SubmitCode from '@/components/status/SubmissionCode';
 import Auth from '@/components/auth/Auth';
 import store from '../store/store.js';
 import Ranking from "@/components/ranking/Ranking";
+import Testcase from "@/components/problems/testcase/Testcase";
 
 Vue.use(Router);
 
@@ -58,6 +59,13 @@ const router = new Router({
             component: ProblemForm,
             props: true,
             beforeEnter: requireAuth(),
+        },
+        {
+            path: '/problem/testcase/modify/:problemNumber',
+            name: 'ProblemTestcase',
+            component: Testcase,
+            props: true,
+            beforeRouteEnter: requireAuth(),
         },
         // Status
         {
