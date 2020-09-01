@@ -62,6 +62,18 @@ let StatusSchema = new mongoose.Schema({
     },
 }, {toJSON: {getters: true}});
 
+StatusSchema.pre('save', async function (next) {
+    await this
+        .populate({
+        path: 'problem'
+    })
+        .populate({
+            path: 'user'
+        })
+        .execPopulate();
+    next();
+});
+
 StatusSchema.statics.getStatus = function (problemNumber) {
     return this.findOne({number: problemNumber})
         .populate('user')
@@ -74,8 +86,8 @@ StatusSchema.statics.getAllStatus = function (page) {
         .sort({'number': -1})
         .populate('user')
         .populate('problem')
-        // .skip((page - 1) * 10)
-        // .limit(10)
+        .skip((page - 1) * 10)
+        .limit(10)
         .exec();
 };
 

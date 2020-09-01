@@ -1,41 +1,36 @@
 <template>
-    <v-row justify="center">
+    <v-row justify="center" v-if="isLogined">
         <v-col cols="11">
             <v-card md-with-hover>
                 <v-card-title>채점 현황</v-card-title>
-                <v-simple-table>
-                    <template v-slot:default>
-                        <thead>
-                        <tr>
-                            <th class="text-center">채점 번호</th>
-                            <th class="text-center">아이디</th>
-                            <th class="text-center">문제 번호</th>
-                            <th class="text-center">결과</th>
-                            <th class="text-center">메모리</th>
-                            <th class="text-center">시간</th>
-                            <th class="text-center">언어</th>
-                            <th class="text-center">제출한 시간</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-if="fetchingStatus">
-                            <td colspan="4">
-                                <v-progress-linear indeterminate></v-progress-linear>
-                            </td>
-                        </tr>
-                        <tr v-else v-for="(state) in Status" v-bind:key="state.number">
-                            <td>{{ state.number }}</td>
-                            <td>{{ state.user.username }}</td>
-                            <td>{{ state.problem.number }}</td>
-                            <td v-bind:style="{color: Result[state.judge_result].color}">{{ Result[state.judge_result].name }}</td>
-                            <td>{{ state.judge_result === 1 ? state.memory / 1024 : '' }}</td>
-                            <td>{{ state.judge_result === 1 ? state.time : '' }}</td>
-                            <td><a href="javascript:void(0);" @click="ViewCode(state.number)">{{ Language[state.language] }}</a></td>
-                            <td>{{ state.submit_time | dateToString }}</td>
-                        </tr>
-                        </tbody>
+                <v-data-table
+                    :headers="stateHeaders"
+                    :items="Status"
+                    :loading="fetchingStatus"
+                >
+                    <template v-slot:[`item.problem`]="{ item }">
+                        <a href="javascript:void(0);" @click="GoProblem(item.problem.number)">{{ item.problem.number }}</a>
                     </template>
-                </v-simple-table>
+                    <template v-slot:[`item.user`]="{ item }">
+                        {{ item.user.username }}
+                    </template>
+                    <template v-slot:[`item.judge_result`]="{ item }">
+                        <div :style="`vertical-align=center;color:` + Result[item.judge_result].color">{{ Result[item.judge_result].name }}</div>
+                    </template>
+                    <template v-slot:[`item.memory`]="{ item }">
+                        {{ item.judge_result === 1 ? item.memory / 1024 : '' }}
+                    </template>
+                    <template v-slot:[`item.time`]="{ item }">
+                        {{ item.judge_result === 1 ? item.time : '' }}
+                    </template>
+                    <template v-slot:[`item.language`]="{ item }">
+                        <div v-if="item.user.username === GetUserName"><a href="javascript:void(0);" @click="ViewCode(item.number)">{{ Language[item.language] }}</a></div>
+                        <div v-else>{{ Language[item.language] }}</div>
+                    </template>
+                    <template v-slot:[`item.submit_time`]="{ item }">
+                        {{ item.submit_time | dateToString }}
+                    </template>
+                </v-data-table>
             </v-card>
         </v-col>
     </v-row>
@@ -54,6 +49,21 @@ export default {
     },
     data() {
         return {
+            stateHeaders: [
+                {
+                    text: '채점 번호',
+                    align: 'center',
+                    sortable: false,
+                    value: 'number',
+                },
+                {text: '아이디', value: 'user', align: 'center',},
+                {text: '문제 번호', value: 'problem', align: 'center',},
+                {text: '결과', value: 'judge_result', align: 'center',},
+                {text: '메모리', value: 'memory', align: 'center',},
+                {text: '시간', value: 'time', align: 'center',},
+                {text: '언어', value: 'language', align: 'center',},
+                {text: '제출한 시간', value: 'submit_time', align: 'center',},
+            ],
             fetchingStatus: false,
             page: 1,
             Status: [],
@@ -73,13 +83,22 @@ export default {
         ViewCode(stateNumber) {
             this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
         },
+        GoProblem(problemNumber) {
+            this.$router.push({name: 'ProblemView', params: {problemNumber: problemNumber}});
+        }
     },
     computed: {
+        isLogined() {
+            return this.$store.getters.isLogined;
+        },
         Result() {
             return SubmitConstants.Result;
         },
         Language() {
             return LanguageConstants.Language;
+        },
+        GetUserName() {
+            return this.$store.getters.getUserData.username;
         },
     },
     filters: {

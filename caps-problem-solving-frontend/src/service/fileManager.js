@@ -3,14 +3,10 @@ import RestAPI from "@/constants/RestAPI";
 
 export default {
     // Post
-    Upload(problemNumber, file, onUploadProgress) {
-        let formData = new FormData();
-
-        formData.append("file", file);
-
-        return axios.post(RestAPI.SERVER_DOMAIN + 'problem/testcase/upload/' + problemNumber, formData, {
+    Upload(problemNumber, data, onUploadProgress) {
+        return axios.post(RestAPI.SERVER_DOMAIN + 'problem/testcase/upload/' + problemNumber, data, {
             headers: {
-                "Content-Type": "multipart/form-data"
+                'Content-Type': 'application/octet-stream'
             },
             onUploadProgress
         });

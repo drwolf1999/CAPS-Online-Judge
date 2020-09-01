@@ -9,12 +9,13 @@ import SubmitCode from '@/components/status/SubmissionCode';
 import Auth from '@/components/auth/Auth';
 import store from '../store/store.js';
 import Ranking from "@/components/ranking/Ranking";
-import Testcase from "@/components/problems/testcase/Testcase";
+import Testcase from "@/components/testcase/Testcase.vue";
 
 Vue.use(Router);
 
 const requireAuth = () => (from, to, next) => {
     if (store.getters.isLogined) return next(); // isAuth === true면 페이지 이동
+    console.log('do auth');
     next('auth'); // isAuth === false면 다시 로그인 화면으로 이동
 };
 

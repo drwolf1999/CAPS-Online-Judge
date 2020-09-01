@@ -39,7 +39,7 @@ export default new Vuex.Store({
         },
         // state 값 가져오기
         isLogined(state) {
-            return state.accessToken != null || state.accessToken !== undefined;
+            return state.accessToken !== undefined && state.accessToken !== null;
         },
         getUserData(state) {
             return jwt.decode(state.accessToken);

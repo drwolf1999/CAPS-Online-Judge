@@ -12,7 +12,7 @@
         name: 'Editor',
         data() {
             return {
-                Content: this.content === undefined || this.content === null ? {opt: {}} : this.content,
+                Content: this.content === undefined || this.content === null || this.content === '' ? {opt: {}} : this.content,
                 Label: this.label,
                 config: {
                     modules: {
@@ -30,7 +30,7 @@
             }
         },
         props: {
-            content: {type: Object,},
+            content: {type: [Object, String], default: null,},
             label: {type: String, default: 'label',},
         },
         methods: {

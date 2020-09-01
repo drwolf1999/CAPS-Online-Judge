@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 
 /**
  * In order
- * problem number
- * name (title)
- * description
- *
+ * user name
+ * password
+ * permission (0=>normal, 1=>admin, 2=>superuser)
  * */
 let AuthSchema = new mongoose.Schema({
     username: {
@@ -17,6 +16,11 @@ let AuthSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    permission: {
+        type: Number,
+        required: true,
+        default: 0,
     },
 });
 

@@ -101,7 +101,7 @@ module.exports = JudgerHelper;
 
 const Judger = {
     getJudgeResult: async (status_info) => {
-        console.log(status_info);
+        // console.log(status_info);
         const language = status_info.language;
         const user_code = status_info.code;
         let ret = {
@@ -127,7 +127,7 @@ const Judger = {
                 break;
             case 2:
                 FILE = FILE + '.3.py';
-                cmd = 'pyinstaller --onfile ' + FILE;
+                cmd = 'pyinstaller --onefile ' + FILE + ' --distpath ' + WORK_PATH;
                 OBJ = OBJ + 'Main.3';
                 break;
             default:
@@ -142,9 +142,9 @@ const Judger = {
             return ret;
         }
         await ShellHelper.sh('chmod +x ' + OBJ);
-        if (language === 2) {
-            await ShellHelper.sh('mv ' + WORK_PATH + 'dist/Main.3 ' + OBJ); // move
-        }
+        // if (language === 2) {
+        //     await ShellHelper.sh('mv ' + WORK_PATH + 'dist/Main.3 ' + OBJ); // move
+        // }
         let files = await fs.readdirSync(TC_PATH + status_info.problem.number);
         const working_dir = TC_PATH + status_info.problem.number + '/';
         let inputs = [], outputs = [];
@@ -178,6 +178,7 @@ const Judger = {
             i++;
             o++;
         }
+        if ((inputs.length === 0 || outputs.length === 0) && ret.judge_result === 0) ret.judge_result = 1;
         return ret;
     },
 };

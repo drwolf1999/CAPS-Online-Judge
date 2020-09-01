@@ -1,7 +1,6 @@
 const Problem = require('../models/Problem');
-const sdk = require('vuetify-file-browser-server/sdk');
-const TC_PATH = '/data/testcase/';
-const path = require('path');
+const { ShellHelper } = require('../middleware/Utility');
+const { UPLOAD_DIR } = require('../constants/Path');
 
 const ProblemController = {
     Count: (req, res, next) => {
@@ -50,7 +49,7 @@ const ProblemController = {
                 });
             })
     },
-    Create: (req, res, next) => {
+    Create: async (req, res, next) => {
         let examples = [], example_string = JSON.parse(req.body.examples);
         for (let i = 0; i < example_string.length; i++) {
             examples.push({
@@ -67,21 +66,20 @@ const ProblemController = {
             output: req.body.output,
             examples: examples,
         })
-        problem.save()
-            .then(problem => {
-                console.log(problem);
-                res.status(200).json({
-                    Problem: problem,
-                    message: 'success',
-                });
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(500).json({
-                    error: error,
-                    message: 'fail',
-                });
+        try {
+            problem = await problem.save();
+            await ShellHelper.sh('mkdir -p ' + UPLOAD_DIR + '/' + problem.number);
+            res.status(200).json({
+                Problem: problem,
+                message: 'success',
             });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                error: error,
+                message: 'fail',
+            });
+        }
     },
     // About Testcase
 };

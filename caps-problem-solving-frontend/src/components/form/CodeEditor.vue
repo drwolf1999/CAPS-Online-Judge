@@ -22,7 +22,6 @@
         data() {
             return {
                 code: this.initialCode,
-                language: this.initialLanguage,
                 options: {
                     vertical: 'hidden',
                     horizontal: 'hidden',
@@ -39,7 +38,7 @@
                 type: String,
                 default: '',
             },
-            initialLanguage: {
+            language: {
                 type: Number,
                 default: 0,
             },

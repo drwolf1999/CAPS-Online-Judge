@@ -87,6 +87,6 @@ ProblemSchema.plugin(require('mongoose-auto-increment').plugin, {
     increment: 1,
 });
 
-let Problem = mongoose.model('Problem', ProblemSchema);
+const Problem = mongoose.model('Problem', ProblemSchema);
 
 module.exports = Problem;

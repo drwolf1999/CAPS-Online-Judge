@@ -34,20 +34,20 @@ services:
 #      - caps_oj_backend
 #    links:
 #      - caps_oj_backend
-#  caps_oj_judge:
-#    container_name: caps_oj_judge
-#    restart: always
-#    build: ./caps-problem-solving-judge-server
-#    volumes:
-#    - /Users/doyeopkim/data/testcase:/data/testcase
-#    - /sys/fs/cgroup:/sys/fs/cgroup:rw
-#    depends_on:
-#      - caps_oj_backend
-#    links:
-#      - caps_oj_backend
-#    cap_add:
-#      - SYS_ADMIN
-#      - SYS_RESOURCE
+  caps_oj_judge:
+    container_name: caps_oj_judge
+    restart: always
+    build: ./caps-problem-solving-judge-server
+    volumes:
+    - /Users/doyeopkim/data/testcase:/data/testcase
+    - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    depends_on:
+      - caps_oj_backend
+    links:
+      - caps_oj_backend
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RESOURCE
 
 #    cgroup_parent: m-executor-abcd
 #    capabilities:

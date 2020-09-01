@@ -57,7 +57,8 @@ const StatusController = {
                     $inc: {
                         submits: 1,
                     }
-                });
+                })
+                    .exec();
                 return res.status(200).json({
                     Status: status,
                     message: 'success',
@@ -78,7 +79,6 @@ const StatusController = {
                 .populate('problem')
                 .limit(1)
                 .then(status => {
-                    console.log('judge ret status : ' + status);
                     if (status === null || status === undefined || Object.keys(status).length === 0) {
                         return res.status(200).json({
                             status: null,
@@ -106,14 +106,15 @@ const StatusController = {
                         time: req.body.time,
                         memory: req.body.memory,
                     }
-                }, {returnNewDocument: true})
+                }, {new: true})
                     .populate('problem')
                     .exec();
-                if (result === null || result === undefined)
+                if (result === null || result === undefined) {
                     res.status(404).json({
                         message: 'forbidden',
                     });
-                if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}});
+                }
+                if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}}).exec();
                 res.status(200).json({
                     result: result,
                 });

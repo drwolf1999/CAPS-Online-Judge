@@ -3,7 +3,7 @@
         <v-col cols="11" v-if="!fetchingStatus && Status !== undefined && Status !== null">
             <v-card md-with-hover>
                 <v-card-title>내 코드</v-card-title>
-                <CodeEditor v-bind:initialCode="Status.code" v-bind:addOption="{readOnly: true}"></CodeEditor>
+                <CodeEditor v-bind:language="Status.language" v-bind:initial-code="Status.code" v-bind:addOption="{readOnly: true}"></CodeEditor>
             </v-card>
         </v-col>
         <v-col cols="11" v-else>
