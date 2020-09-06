@@ -28,6 +28,17 @@ export default {
                 });
         });
     },
+    Rejudge(data) {
+        return new Promise((resolve, reject) => {
+            axios.post(RestAPI.SERVER_DOMAIN + 'status/rejudge', data)
+                .then(response => {
+                    resolve(response.data)
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    }
 };
 
 /*

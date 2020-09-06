@@ -18,13 +18,13 @@ let StatusSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    user: {
-        type: mongoose.Schema.Types.ObjectID,
+    username: {
+        type: String,
         ref: 'Auth',
         required: true,
     },
-    problem: {
-        type: mongoose.Schema.Types.ObjectID,
+    problemNumber: {
+        type: Number,
         ref: 'Problem',
         required: true,
     },
@@ -62,6 +62,20 @@ let StatusSchema = new mongoose.Schema({
     },
 }, {toJSON: {getters: true}});
 
+StatusSchema.virtual('problem', {
+    ref: 'Problem',
+    localField: 'problemNumber',
+    foreignField: 'number',
+    justOne: true // for many-to-1 relationships
+});
+
+StatusSchema.virtual('user', {
+    ref: 'Auth',
+    localField: 'username',
+    foreignField: 'username',
+    justOne: true // for many-to-1 relationships
+});
+
 StatusSchema.pre('save', async function (next) {
     await this
         .populate({
@@ -74,10 +88,10 @@ StatusSchema.pre('save', async function (next) {
     next();
 });
 
-StatusSchema.statics.getStatus = function (problemNumber) {
-    return this.findOne({number: problemNumber})
+StatusSchema.statics.getStatus = function (statusNumber) {
+    return this.findOne({number: statusNumber})
         .populate('user')
-        .populate('program')
+        .populate('problem')
         .exec();
 };
 

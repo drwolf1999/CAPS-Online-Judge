@@ -52,9 +52,13 @@ const ShellHelper = {
     },
 };
 const JudgerHelper = {
-    judge: async (FILE, problem, input) => {
+    judge: async (FILE, problem, input, language) => {
         let time_limit = problem.time_limit;
         let memory_limit = problem.memory_limit;
+        if (language === 2) {
+            time_limit = time_limit * 2 + 1;
+            memory_limit = memory_limit * 2 + 32;
+        }
         let judger = '/usr/lib/judger/libjudger.so';
         judger += ' --max_cpu_time=' + (time_limit * 1000);
         judger += ' --max_memory=' + (memory_limit * 1000 * 1000); // byte to mb
@@ -169,7 +173,7 @@ const Judger = {
                 o++;
                 continue;
             }
-            let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
+            let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i], language));
             // console.log(result);
             ret.judge_result = await JudgerHelper.Update(ret.judge_result, result.result, outputs[o]);
             if (ret.judge_result !== 1) break;

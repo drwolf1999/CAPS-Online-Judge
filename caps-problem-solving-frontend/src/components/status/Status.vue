@@ -7,6 +7,8 @@
                     :headers="stateHeaders"
                     :items="Status"
                     :loading="fetchingStatus"
+                    item-key="number"
+                    loading-text="fetching....."
                 >
                     <template v-slot:[`item.problem`]="{ item }">
                         <a href="javascript:void(0);" @click="GoProblem(item.problem.number)">{{ item.problem.number }}</a>
@@ -15,7 +17,16 @@
                         {{ item.user.username }}
                     </template>
                     <template v-slot:[`item.judge_result`]="{ item }">
-                        <div :style="`vertical-align=center;color:` + Result[item.judge_result].color">{{ Result[item.judge_result].name }}</div>
+                        <div :style="`vertical-align: middle;color:` + Result[item.judge_result].color">
+                            {{ Result[item.judge_result].name }}
+                            <v-progress-circular
+                                v-if="item.judge_result === 6"
+                                :size="20"
+                                :width="1"
+                                :color="Result[item.judge_result].color"
+                                indeterminate
+                            ></v-progress-circular>
+                        </div>
                     </template>
                     <template v-slot:[`item.memory`]="{ item }">
                         {{ item.judge_result === 1 ? item.memory / 1024 : '' }}
@@ -44,8 +55,22 @@ import Utility from '@/helper/Utility';
 
 export default {
     name: 'Status',
+    created() {
+        this.$socket.on('result', (data) => {
+            // if (!data.success) this.$notify({
+            //     title: '에러 발생',
+            //     text: '관리자에게 연락 바랍니다.',
+            //     type: 'error',
+            // });
+            // else
+            console.log(data.Status.judge_result);
+            this.Status.splice(0, 1, data.Status);
+            if (data.Status.judge_result >= 6) setTimeout(this.$socket.emit('getStatus', {statusNumber: data.statusNumber, judge_result: data.Status.judge_result}), 1000);
+        });
+        this.UpdateStatus();
+    },
     mounted() {
-        this.fetchStatus();
+        this.FetchStatus();
     },
     data() {
         return {
@@ -67,10 +92,11 @@ export default {
             fetchingStatus: false,
             page: 1,
             Status: [],
+            updateTimer: null,
         };
     },
     methods: {
-        fetchStatus() {
+        FetchStatus() {
             this.Status.splice(0, this.Status.length);
             StatusService.GetAllStatus(this.page)
                 .then(response => {
@@ -79,6 +105,34 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        UpdateStatus() {
+            if (this.Status.length > 0) {
+                const f = this.Status[0];
+                this.$socket.emit('joinStatus', {statusNumber: f.number});
+
+                this.$socket.emit('getStatus', {statusNumber: f.number, judge_result: f.judge_result});
+            }
+            // for (let i = 0; i < this.Status.length; i++) {
+            //     const f = this.Status[i];
+            //     let type = true;
+            //     if (f.judge_result >= 6) {
+            //         console.log(f.number);
+            //         this.$socket.emit('joinStatus', {statusNumber: f.number});
+            //
+            //         this.$socket.emit('getStatus', {statusNumber: f.number});
+            //
+            //         this.$socket.on('result', (data) => {
+            //             type = data.success;
+            //             if (!type) this.$notify({
+            //                 title: '에러 발생',
+            //                 text: '관리자에게 연락 바랍니다.',
+            //                 type: 'error',
+            //             });
+            //             else this.Status.splice(i, 1, data.Status);
+            //         });
+            //     }
+            // }
         },
         ViewCode(stateNumber) {
             this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
@@ -107,6 +161,11 @@ export default {
         },
         doubleDigit: function (value) {
             return Utility.TimeDigit1To2(value);
+        },
+    },
+    watch: {
+        Status(n, o) {
+            if (n !== o) this.UpdateStatus();
         },
     },
 }

@@ -1,6 +1,6 @@
 const Problem = require('../models/Problem');
-const { ShellHelper } = require('../middleware/Utility');
-const { UPLOAD_DIR } = require('../constants/Path');
+const {ShellHelper} = require('../middleware/Utility');
+const {UPLOAD_DIR} = require('../constants/Path');
 
 const ProblemController = {
     Count: (req, res, next) => {
@@ -61,6 +61,7 @@ const ProblemController = {
             name: req.body.name,
             memory_limit: parseInt(req.body.memory_limit) * 1000 * 1000,
             time_limit: parseInt(req.body.time_limit) * 1000,
+            score: parseInt(req.body.score),
             description: req.body.description,
             input: req.body.input,
             output: req.body.output,
@@ -78,6 +79,38 @@ const ProblemController = {
             res.status(500).json({
                 error: error,
                 message: 'fail',
+            });
+        }
+    },
+    Update: async (req, res, next) => {
+        let examples = [], example_string = JSON.parse(req.body.examples);
+        for (let i = 0; i < example_string.length; i++) {
+            examples.push({
+                input: example_string[i].input,
+                output: example_string[i].output,
+            });
+        }
+        try {
+            console.log('init');
+            const newProblem = await Problem.findOneAndUpdate({number: req.params.problemNumber}, {
+                name: req.body.name,
+                memory_limit: parseInt(req.body.memory_limit) * 1000 * 1000,
+                time_limit: parseInt(req.body.time_limit) * 1000,
+                score: parseInt(req.body.score),
+                description: req.body.description,
+                input: req.body.input,
+                output: req.body.output,
+                examples: examples,
+            }, {new: true});
+            return res.status(201).json({
+                Problem: newProblem,
+                message: 'success',
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                error: error,
+                message: 'success',
             });
         }
     },

@@ -1,7 +1,7 @@
 <template>
-    <v-card color="grey lighten-4" flat>
-        <v-toolbar color="primary" dark>
-            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+    <v-card>
+        <v-toolbar color="primary" dark class="indigo">
+            <v-app-bar-nav-icon @click="flipNav"></v-app-bar-nav-icon>
             <v-toolbar-title @click="GoHome">CAPS OJ</v-toolbar-title>
             <v-spacer></v-spacer>
             <Button v-bind:content="`문제`" v-bind:text-btn="true" v-on:click.native="GoProblem"></Button>
@@ -17,12 +17,26 @@ import Button from '@/components/form/Button';
 
 export default {
     name: 'Header',
+    data() {
+        return {
+            items: [
+                {title: 'Home', icon: 'dashboard'},
+                {title: 'About', icon: 'question_answer'},
+            ],
+        }
+    },
     computed: {
         isLogined() {
             return this.$store.getters.isLogined;
         }
     },
+    props: {
+        sideNav: [Object, Boolean],
+    },
     methods: {
+        flipNav() {
+            this.$emit('change-nav', !this.sideNav);
+        },
         GoHome() {
             if (this.$route.path !== '/') this.$router.push('/').catch(() => {
             });
@@ -40,7 +54,8 @@ export default {
             });
         },
         LOGOUT() {
-            this.$store.dispatch('LOGOUT').then(() => this.$router.push('/auth').catch(() => {}));
+            this.$store.dispatch('LOGOUT').then(() => this.$router.push('/auth').catch(() => {
+            }));
         },
     },
     components: {

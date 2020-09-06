@@ -1,12 +1,13 @@
 const Status = require('../models/Status');
 const Problem = require('../models/Problem');
-
+const UserProblemUpdate = require('./StandingController');
 const StatusController = {
         /// Original
         All: (req, res, next) => {
-            console.log(req.params.page);
+            // console.log(req.params.page);
             Status.getAllStatus(req.params.page)
                 .then(Status => {
+                    // console.log(Status);
                     res.status(200).json({
                         Status: Status,
                         message: 'success',
@@ -38,17 +39,49 @@ const StatusController = {
                     });
                 });
         },
+        GetBySocket: (io) => {
+            const instanceIO = io.of('/getStatus');
+            let statusNumber;
+            instanceIO.on('connection', socket => {
+                console.log('connection');
+                let instanceID = socket.id;
+                socket.on('joinStatus', async (info) => {
+                    socket.join(info.statusNumber);
+                    statusNumber = info.statusNumber;
+                    console.log('connect   ' + info.statusNumber);
+                });
+                socket.on('getStatus', async (info) => {
+                    const sN = info.statusNumber;
+                    try {
+                        const ret = await Status.getStatus(sN);
+                        console.log(statusNumber + '`room : ' + JSON.stringify(ret));
+                        instanceIO.to(statusNumber).emit('result', {
+                            statusNumber: statusNumber,
+                            success: true,
+                            Status: ret,
+                        });
+                        if (ret.judge_result < 6) socket.leave();
+                    } catch (error) {
+                        console.log(error);
+                        instanceIO.to(statusNumber).emit('result', {
+                            success: false,
+                            error: error,
+                        });
+                    }
+                });
+            });
+        },
         Create: async (req, res, next) => {
             try {
-                const problem = await Problem.findById(req.body.problem).exec();
+                const problem = await Problem.getProblem(req.body.problem);
                 if (problem === null || problem === undefined)
                     return res.status(404).json({
                         status: null,
                         message: 'forbidden',
                     });
                 let status = new Status({
-                    user: req.body.user,
-                    problem: req.body.problem,
+                    username: req.body.username,
+                    problemNumber: req.body.problem,
                     code: req.body.code,
                     language: req.body.language,
                 });
@@ -59,6 +92,7 @@ const StatusController = {
                     }
                 })
                     .exec();
+                await UserProblemUpdate.SubmitUpdate(req.body.username, req.body.problem, status.submit_time);
                 return res.status(200).json({
                     Status: status,
                     message: 'success',
@@ -69,6 +103,28 @@ const StatusController = {
                     error: error,
                     message: 'error',
                 });
+            }
+        },
+        Rejudging: async (req, res, next) => {
+            try {
+                let filter = {};
+                if (parseInt(req.body.type) === 0) {
+                    filter['problemNumber'] = req.body.problemNumber;
+                }
+                await Status
+                    .updateMany({problemNumber: req.body.problemNumber}, {$set: {judge_result: 7}});
+                await UserProblemUpdate.Reset(req.body.problemNumber);
+                await Problem.update({problemNumber: req.body.problemNumber}, {$set:{answers: 0}});
+                return res.status(200).json({
+                    result: true,
+                    message: 'success',
+                });
+            } catch (error) {
+                return res.status(500).json({
+                    result: false,
+                    error: error,
+                    message: 'error',
+                })
             }
         },
         /////// for judgement
@@ -108,6 +164,7 @@ const StatusController = {
                     }
                 }, {new: true})
                     .populate('problem')
+                    .populate('user')
                     .exec();
                 if (result === null || result === undefined) {
                     res.status(404).json({
@@ -115,6 +172,7 @@ const StatusController = {
                     });
                 }
                 if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}}).exec();
+                if (result.judge_result < 6) await UserProblemUpdate.ResultUpdate(result.username, result.problemNumber, result.judge_result, result.submit_time);
                 res.status(200).json({
                     result: result,
                 });

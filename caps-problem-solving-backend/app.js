@@ -66,7 +66,14 @@ app.use((req, res, next) => {
     next();
 });
 
+const StatusSocket = require('./controllers/StatusController').GetBySocket;
+const io = require('socket.io');
+
+app.io = io();
+app.io.set('origins', '*:*');
+
 app.use('/', require('./routes/index'));
+StatusSocket(app.io);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

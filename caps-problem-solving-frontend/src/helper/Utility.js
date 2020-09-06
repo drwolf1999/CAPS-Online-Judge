@@ -135,4 +135,13 @@ export default class Utility {
 
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
+
+    static numberToAlphabet(number) { // 1-base
+        const ALPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        return ALPH[number - 1];
+    }
+
+    static realNumber(number) {
+        return Math.floor(number);
+    }
 }

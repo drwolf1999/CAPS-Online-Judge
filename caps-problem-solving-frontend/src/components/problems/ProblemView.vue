@@ -1,7 +1,7 @@
 <template>
     <v-row justify="center">
         <v-col cols="11" v-if="Problem && Problem.number === ProblemNumber">
-            <v-card md-with-hover>
+            <v-card md-with-hover v-if="!isModifying">
                 <v-card-title>{{ Problem.number }}. {{ Problem.name }}</v-card-title>
                 <v-form>
                     <v-row justify="center">
@@ -12,6 +12,7 @@
                                     <tr>
                                         <th class="text-center">메모리 제한</th>
                                         <th class="text-center">시간 제한</th>
+                                        <th class="text-center">점수</th>
                                         <th class="text-center">맞은 수</th>
                                         <th class="text-center">제출 수</th>
                                     </tr>
@@ -20,6 +21,7 @@
                                     <tr>
                                         <td>{{ Problem.memory_limit }} MB</td>
                                         <td>{{ Problem.time_limit }} 초</td>
+                                        <td>{{ Problem.score }}</td>
                                         <td>{{ Problem.answers }}</td>
                                         <td>{{ Problem.submits }}</td>
                                     </tr>
@@ -61,13 +63,18 @@
                         </v-col>
                     </v-row>
                 </v-form>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <Button v-if="isAdmin" class="blue--text lighten-2" v-bind:content="`문제 수정`" v-bind:text-btn="true" v-on:click.native="UpdateMod"></Button>
+                </v-card-actions>
             </v-card>
+            <ProblemForm v-else :initial-problem="Problem" v-on:finished="FinishUpdateMod"></ProblemForm>
             <v-col></v-col>
             <v-divider></v-divider>
-            <ProblemSubmit v-bind:problem-id="Problem._id"></ProblemSubmit>
+            <ProblemSubmit v-bind:problem-id="Problem.number"></ProblemSubmit>
             <v-col></v-col>
             <v-spacer></v-spacer>
-            <router-link :to="'/problem/testcase/modify/' + Problem.number">
+            <router-link v-if="isAdmin" :to="'/problem/testcase/modify/' + Problem.number">
                 <Button v-bind:content="`testcase`" v-bind:color="`primary`" v-bind:block="true"></Button>
             </router-link>
         </v-col>
@@ -83,12 +90,14 @@
 import EditorView from '@/components/form/EditorView';
 import ProblemSubmit from '@/components/problems/ProblemSubmit';
 import Button from "@/components/form/Button";
+import ProblemForm from "@/components/problems/ProblemForm";
 
 export default {
     name: 'ProblemView',
     data() {
         return {
             ProblemNumber: parseInt(this.problemNumber),
+            isModifying: false,
         };
     },
     props: ['problemNumber'],
@@ -99,9 +108,21 @@ export default {
         Problem() {
             return this.$store.getters.getProblem;
         },
+        isAdmin() {
+            return this.$store.getters.getUserData.permission >= 1;
+        },
     },
-    methods: {},
+    methods: {
+        UpdateMod() {
+            this.isModifying = true;
+        },
+        FinishUpdateMod() {
+            this.isModifying = false;
+            this.$store.dispatch('fetchProblem', this.ProblemNumber);
+        },
+    },
     components: {
+        ProblemForm,
         Button,
         ProblemSubmit,
         EditorView,

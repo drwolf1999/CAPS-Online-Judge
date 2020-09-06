@@ -32,6 +32,7 @@ export default new Vuex.Store({
         problem: null,
         /* 로그인 후 넘어갈 url */
         nextDestination: '/',
+        lastSubmitLanguage: 0,
     },
     getters: {
         getProblem(state) {
@@ -46,6 +47,9 @@ export default new Vuex.Store({
         },
         getNextDestination(state) {
             return state.nextDestination;
+        },
+        getLastSubmitLanguage(state) {
+            return state.lastSubmitLanguage;
         },
     },
     mutations: {
@@ -69,6 +73,9 @@ export default new Vuex.Store({
         },
         setNextDestination(state, url) {
             state.nextDestination = url;
+        },
+        setLastSubmitLanguage(state, value) {
+            state.lastSubmitLanguage = value;
         },
     },
     actions: {
@@ -98,6 +105,9 @@ export default new Vuex.Store({
         },
         setNextDestination(state, url) {
             state.commit('setNextDestination', url);
+        },
+        setLastSubmitLanguage(state, value) {
+            state.commit('setLastSubmitLanguage', value);
         },
     }
 });

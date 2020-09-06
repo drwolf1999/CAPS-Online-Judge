@@ -1,6 +1,5 @@
 <template>
     <v-card>
-        {{ selectedLanguage }}
         <v-card-title>코드</v-card-title>
         <v-row justify="center">
             <v-col cols="11">
@@ -30,18 +29,17 @@ export default {
             isWriteCode: true,
             code: '',
             languageQuery: '',
-            selectedLanguage: 0,
+            selectedLanguage: this.$store.getters.getLastSubmitLanguage || 0,
         }
     },
     props: {
-        problemId: String,
+        problemId: Number,
     },
     methods: {
         onChangeCode(value) {
             this.code = value;
         },
         onSubmit() {
-            console.log(this.problemId);
             if (this.getUserId === undefined || this.getUserId === null) {
                 this.$notify({
                     title: '로그인을 먼저 해주세요',
@@ -58,9 +56,10 @@ export default {
                 });
                 return;
             }
+            this.$store.dispatch('setLastSubmitLanguage', this.selectedLanguage);
             this.isWriteCode = !this.isWriteCode;
             StatusService.DoSubmit({
-                user: this.getUserId,
+                username: this.getUserId,
                 problem: this.problemId,
                 code: this.code,
                 language: this.selectedLanguage,
@@ -80,7 +79,7 @@ export default {
     },
     computed: {
         getUserId() {
-            return this.$store.getters.getUserData.user__id;
+            return this.$store.getters.getUserData.username;
         },
         Language() {
             let ret = [];

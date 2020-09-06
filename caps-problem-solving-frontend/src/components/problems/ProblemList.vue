@@ -36,7 +36,7 @@
             </v-card>
         </v-col>
         <v-col cols="11">
-            <router-link :to="'/problem/create'">
+            <router-link v-if="isAdmin" :to="'/problem/create'">
                 <Button v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Add Problem`"></Button>
             </router-link>
         </v-col>
@@ -92,14 +92,18 @@
                 this.Query = value;
             },
             ProblemClick(problemId) {
-                const NextDestination = '/problem/view/' + problemId;
-                this.$router.push(NextDestination);
+                this.$router.push({name: 'ProblemView', params: {problemNumber: problemId}});
             },
         },
         watch: {
             '$route.query'() {
                 this.fetchProblems();
             }
+        },
+        computed: {
+            isAdmin() {
+                return this.$store.getters.getUserData.permission >= 1;
+            },
         },
         components: {
             Input,

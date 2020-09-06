@@ -4,6 +4,7 @@ const router = express.Router();
 const problemRouter = require('./problem');
 const statusRouter = require('./status');
 const authRouter = require('./auth');
+const standingRouter = require('./standing');
 const judgeRouter = require('./forJudge');
 const fileRouter = require('./files');
 
@@ -18,6 +19,7 @@ router.get('/', function (req, res, next) {
 router.use('/problem', problemRouter);
 router.use('/status', statusRouter);
 router.use('/auth', authRouter);
+router.use('/standing', standingRouter);
 router.use('/for/judgement/secure', judgeRouter);
 
 const LocalStorage = require('../middleware/files/FileManger');

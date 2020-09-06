@@ -45,6 +45,8 @@ services:
       - caps_oj_backend
     links:
       - caps_oj_backend
+    ports:
+    - "2931:3000"
     cap_add:
       - SYS_ADMIN
       - SYS_RESOURCE

@@ -1,6 +1,6 @@
 <template>
     <v-row justify="center">
-        <v-col cols="11">
+        <v-col :cols="isCreate ? 11 : 12">
             <v-card md-with-hover>
                 <v-card-title v-if="isCreate">문제 추가</v-card-title>
                 <v-card-title v-else>문제 수정</v-card-title>
@@ -11,12 +11,16 @@
                         </v-col>
                         <v-col cols="11">
                             <v-row>
-                                <v-col cols="6">
-                                    <Input v-bind:label="`메모리 제한`" v-bind:model="Problem.memory_limit" v-on:input="onChangeMemory"/>
+                                <v-col cols="4">
+                                    <Input v-bind:label="`메모리 제한`" v-bind:model="Problem.memory_limit.toString()" v-on:input="onChangeMemory"/>
                                 </v-col>
-                                <v-col cols="6">
-                                    <Input v-bind:label="`시간 제한`" v-bind:model="Problem.time_limit" v-on:input="onChangeTime"/>
+                                <v-col cols="4">
+                                    <Input v-bind:label="`시간 제한`" v-bind:model="Problem.time_limit.toString()" v-on:input="onChangeTime"/>
                                 </v-col>
+                                <v-col cols="4">
+                                    <Input v-bind:label="`score`" v-bind:model="Problem.score.toString()" v-on:input="onChangeScore"/>
+                                </v-col>
+
                             </v-row>
                         </v-col>
                         <v-col cols="11">
@@ -42,98 +46,145 @@
                 </v-form>
             </v-card>
         </v-col>
-        <v-col cols="11">
+        <v-col :cols="isCreate ? 11 : 12">
             <Button v-if="isCreate" v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Add Problem`" v-on:click.native="DoCreateProblem"></Button>
-            <Button v-else v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Modify Problem`" v-on:click.native="DoCreateProblem"></Button>
+            <Button v-else v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Update Problem`" v-on:click.native="DoUpdateProblem"></Button>
         </v-col>
     </v-row>
 </template>
 
 <script>
-    import Input from '@/components/form/Input.vue';
-    import Button from '@/components/form/Button';
-    import Editor from '@/components/form/Editor';
-    import ProblemService from '@/service/problem.js';
+import Input from '@/components/form/Input.vue';
+import Button from '@/components/form/Button';
+import Editor from '@/components/form/Editor';
+import ProblemService from '@/service/problem.js';
 
-    export default {
-        name: 'ProblemForm',
-        data() {
-            return {
-                isCreate: this.initialProblem === undefined || this.initialProblem === null,
-                Problem: this.initialProblem !== undefined && this.initialProblem !== null ? this.initialProblem : {
-                    name: '',
-                    memory_limit: '128',
-                    time_limit: '1',
-                    description: {},
-                    input: {},
-                    output: {},
-                    examples: [{input: '', output: ''}],
-                },
-            };
+export default {
+    name: 'ProblemForm',
+    data() {
+        return {
+            isCreate: this.initialProblem === undefined || this.initialProblem === null,
+            Problem: this.initialProblem !== undefined && this.initialProblem !== null ? this.initialProblem : {
+                name: '',
+                memory_limit: '128',
+                time_limit: '1',
+                score: '0',
+                description: {},
+                input: {},
+                output: {},
+                examples: [{input: '', output: ''}],
+            },
+        };
+    },
+    props: {
+        initialProblem: {
+            type: Object,
+            default: null,
         },
-        props: ['initialProblem'],
-        methods: {
-            onChangeName(value) {
-                this.Problem.name = value;
-            },
-            onChangeMemory(value) {
-                this.Problem.memory_limit = value;
-            },
-            onChangeTime(value) {
-                this.Problem.time_limit = value;
-            },
-            onChangeDescription(value) {
-                this.Problem.description = value;
-            },
-            onChangeInput(value) {
-                this.Problem.input = value;
-            },
-            onChangeOutput(value) {
-                this.Problem.output = value;
-            },
-            DoCreateProblem() {
-                if (this.Problem.name === '') {
+    },
+    methods: {
+        onChangeName(value) {
+            this.Problem.name = value;
+        },
+        onChangeMemory(value) {
+            this.Problem.memory_limit = value;
+        },
+        onChangeTime(value) {
+            this.Problem.time_limit = value;
+        },
+        onChangeScore(value) {
+            this.Problem.score = value;
+        },
+        onChangeDescription(value) {
+            this.Problem.description = value;
+        },
+        onChangeInput(value) {
+            this.Problem.input = value;
+        },
+        onChangeOutput(value) {
+            this.Problem.output = value;
+        },
+        isOKProblem() {
+            const regexp = /^[0-9]*$/;
+            if (this.Problem.name === '') {
+                this.$notify({
+                    title: '제목은 필수입니다',
+                    text: '제목을 입력해 주세요',
+                    type: 'warn',
+                });
+                return false;
+            }
+            if (this.Problem.description === '') {
+                this.$notify({
+                    title: '문제 설명은 필수입니다',
+                    text: '설명을 입력해 주세요',
+                    type: 'warn',
+                });
+                return false;
+            }
+            if (!regexp.test(this.Problem.time_limit) || !regexp.test(this.Problem.memory_limit) || !regexp.test(this.Problem.score)) {
+                this.$notify({
+                    title: 'time, memory score must be integer 입니다',
+                    text: '설명을 입력해 주세요',
+                    type: 'warn',
+                });
+                return false;
+            }
+            return true;
+        },
+        DoCreateProblem() {
+            if (!this.isOKProblem()) return;
+            ProblemService.CreateProblem({
+                name: this.Problem.name,
+                memory_limit: this.Problem.memory_limit,
+                time_limit: this.Problem.time_limit,
+                score: this.Problem.score,
+                description: JSON.stringify(this.Problem.description),
+                input: JSON.stringify(this.Problem.input),
+                output: JSON.stringify(this.Problem.output),
+                examples: JSON.stringify(this.Problem.examples),
+            })
+                .then((response) => {
                     this.$notify({
-                        title: '제목은 필수입니다',
-                        text: '제목을 입력해 주세요',
-                        type: 'warn',
+                        title: '문제 등록이 완료되었습니다.',
+                        text: '문제 페이지로 이동합니다.',
+                        type: 'success',
                     });
-                    return;
-                }
-                if (this.Problem.description === '') {
-                    this.$notify({
-                        title: '문제 설명은 필수입니다',
-                        text: '설명을 입력해 주세요',
-                        type: 'warn',
-                    });
-                    return;
-                }
-                ProblemService.CreateProblem({
-                    name: this.Problem.name,
-                    memory_limit: this.Problem.memory_limit,
-                    time_limit: this.Problem.time_limit,
-                    description: JSON.stringify(this.Problem.description),
-                    input: JSON.stringify(this.Problem.input),
-                    output: JSON.stringify(this.Problem.output),
-                    examples: JSON.stringify(this.Problem.examples),
+                    this.$router.push({name: 'ProblemView', params: {problemNumber: response.Problem.number}});
                 })
-                    .then((response) => {
-                        this.$notify({
-                            title: '문제 등록이 완료되었습니다.',
-                            text: '문제 페이지로 이동합니다.',
-                            type: 'success',
-                        });
-                        this.$router.push({name: 'ProblemView', params: {problemNumber: response.Problem.number}});
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
-            },
+                .catch(error => {
+                    console.log(error);
+                })
         },
-        components: {
-            Input,
-            Button,
-            Editor,
+        DoUpdateProblem() {
+            if (!this.isOKProblem()) return;
+            ProblemService.UpdateProblem(this.Problem.number, {
+                name: this.Problem.name,
+                memory_limit: this.Problem.memory_limit,
+                time_limit: this.Problem.time_limit,
+                score: this.Problem.score,
+                description: JSON.stringify(this.Problem.description),
+                input: JSON.stringify(this.Problem.input),
+                output: JSON.stringify(this.Problem.output),
+                examples: JSON.stringify(this.Problem.examples),
+            })
+                .then((response) => { // eslint-disable-line
+                    this.$notify({
+                        title: '문제 등록이 완료되었습니다.',
+                        text: '문제 페이지로 이동합니다.',
+                        type: 'success',
+                    });
+                    this.$emit('finished');
+                })
+                .catch(error => {
+                    console.log(error);
+                })
         }
+    },
+    components: {
+        Input,
+        Button,
+        Editor,
     }
+}
 </script>
