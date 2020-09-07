@@ -8,7 +8,7 @@ import Status from '@/components/status/Status.vue';
 import SubmitCode from '@/components/status/SubmissionCode.vue';
 import Auth from '@/components/auth/Auth.vue';
 import store from '@/store/store.js';
-import Ranking from "@/components/ranking/Ranking";
+import Ranking from "@/components/ranking/Ranking.vue";
 import Testcase from "@/components/testcase/Testcase.vue";
 import Rejudge from "@/components/DangerZone/Rejudge.vue";
 
@@ -67,7 +67,7 @@ const index = new Router({
             name: 'ProblemTestcase',
             component: Testcase,
             props: true,
-            beforeRouteEnter: requireAuth(),
+            beforeEnter: requireAuth(),
         },
         // Status
         {

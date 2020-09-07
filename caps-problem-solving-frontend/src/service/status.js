@@ -38,11 +38,5 @@ export default {
                     reject(error);
                 });
         });
-    }
+    },
 };
-
-/*
-router.get('/all/:page', controller.All);
-router.get('/get/:statusNumber', controller.Get);
-router.post('/create', controller.Create);
-* */

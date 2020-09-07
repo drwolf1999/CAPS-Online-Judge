@@ -108,6 +108,6 @@
         components: {
             Input,
             Button,
-        }
-    }
+        },
+    };
 </script>

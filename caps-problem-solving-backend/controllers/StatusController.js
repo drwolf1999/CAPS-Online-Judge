@@ -44,31 +44,34 @@ const StatusController = {
             let statusNumber;
             instanceIO.on('connection', socket => {
                 console.log('connection');
-                let instanceID = socket.id;
-                socket.on('joinStatus', async (info) => {
-                    socket.join(info.statusNumber);
-                    statusNumber = info.statusNumber;
-                    console.log('connect   ' + info.statusNumber);
-                });
-                socket.on('getStatus', async (info) => {
-                    const sN = info.statusNumber;
-                    try {
-                        const ret = await Status.getStatus(sN);
-                        console.log(statusNumber + '`room : ' + JSON.stringify(ret));
-                        instanceIO.to(statusNumber).emit('result', {
-                            statusNumber: statusNumber,
-                            success: true,
-                            Status: ret,
-                        });
-                        if (ret.judge_result < 6) socket.leave();
-                    } catch (error) {
-                        console.log(error);
-                        instanceIO.to(statusNumber).emit('result', {
-                            success: false,
-                            error: error,
-                        });
-                    }
-                });
+                // socket.on('disconnect', (data) => {
+                //     //
+                // });
+                // let instanceID = socket.id;
+                // socket.on('joinStatus', async (info) => {
+                //     socket.join(info.statusNumber);
+                //     statusNumber = info.statusNumber;
+                //     console.log('connect   ' + info.statusNumber);
+                // });
+                // socket.on('getStatus', async (info) => {
+                //     const sN = info.statusNumber;
+                //     try {
+                //         const ret = await Status.getStatus(sN);
+                //         console.log(statusNumber + '`room : ' + JSON.stringify(ret));
+                //         instanceIO.to(statusNumber).emit('result', {
+                //             statusNumber: statusNumber,
+                //             success: true,
+                //             Status: ret,
+                //         });
+                //         if (ret.judge_result < 6) socket.leave();
+                //     } catch (error) {
+                //         console.log(error);
+                //         instanceIO.to(statusNumber).emit('result', {
+                //             success: false,
+                //             error: error,
+                //         });
+                //     }
+                // });
             });
         },
         Create: async (req, res, next) => {
@@ -114,7 +117,7 @@ const StatusController = {
                 await Status
                     .updateMany({problemNumber: req.body.problemNumber}, {$set: {judge_result: 7}});
                 await UserProblemUpdate.Reset(req.body.problemNumber);
-                await Problem.update({problemNumber: req.body.problemNumber}, {$set:{answers: 0}});
+                await Problem.update({number: req.body.problemNumber}, {$set:{answers: 0}});
                 return res.status(200).json({
                     result: true,
                     message: 'success',
@@ -173,6 +176,14 @@ const StatusController = {
                 }
                 if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}}).exec();
                 if (result.judge_result < 6) await UserProblemUpdate.ResultUpdate(result.username, result.problemNumber, result.judge_result, result.submit_time);
+                //// broadcast all clients
+                const io = req.app.io.of('/getStatus');
+                console.log(io);
+                io.emit('result', {
+                    statusNumber: result.number,
+                    judge_result: result.judge_result,
+                });
+                //// end broadcast
                 res.status(200).json({
                     result: result,
                 });

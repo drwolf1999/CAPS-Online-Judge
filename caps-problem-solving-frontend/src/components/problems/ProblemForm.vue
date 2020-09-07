@@ -185,6 +185,6 @@ export default {
         Input,
         Button,
         Editor,
-    }
-}
+    },
+};
 </script>

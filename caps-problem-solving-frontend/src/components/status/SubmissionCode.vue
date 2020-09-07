@@ -61,5 +61,5 @@ export default {
             return Utility.TimeDigit1To2(value);
         },
     },
-}
+};
 </script>

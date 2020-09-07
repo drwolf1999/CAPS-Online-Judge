@@ -112,5 +112,5 @@ export default {
             return Utility.realNumber(number);
         },
     },
-}
+};
 </script>

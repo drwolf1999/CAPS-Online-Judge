@@ -72,8 +72,8 @@ const io = require('socket.io');
 app.io = io();
 app.io.set('origins', '*:*');
 
-app.use('/', require('./routes/index'));
 StatusSocket(app.io);
+app.use('/', require('./routes/index'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

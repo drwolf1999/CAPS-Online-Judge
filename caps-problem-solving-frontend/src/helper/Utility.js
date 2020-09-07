@@ -144,4 +144,4 @@ export default class Utility {
     static realNumber(number) {
         return Math.floor(number);
     }
-}
+};

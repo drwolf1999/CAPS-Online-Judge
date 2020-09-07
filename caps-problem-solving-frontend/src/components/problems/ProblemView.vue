@@ -30,16 +30,13 @@
                             </v-simple-table>
                         </v-col>
                         <v-col cols="11">
-                            <v-subheader>문제</v-subheader>
-                            <EditorView v-bind:label="`문제`" v-bind:content="Problem.description"/>
+                            <Editor v-bind:label="`문제`" v-bind:content="Problem.description" v-bind:read-only="true"/>
                         </v-col>
                         <v-col cols="11">
-                            <v-subheader>입력</v-subheader>
-                            <EditorView v-bind:label="`입력`" v-bind:content="Problem.input"/>
+                            <Editor v-bind:label="`입력`" v-bind:content="Problem.input" v-bind:read-only="true"/>
                         </v-col>
                         <v-col cols="11">
-                            <v-subheader>출력</v-subheader>
-                            <EditorView v-bind:label="`출력`" v-bind:content="Problem.output"/>
+                            <Editor v-bind:label="`출력`" v-bind:content="Problem.output" v-bind:read-only="true"/>
                         </v-col>
                         <v-col cols="11">
                             <v-row v-for="(example, index) in Problem.examples" v-bind:key="index" no-gutters>
@@ -87,7 +84,7 @@
 </template>
 
 <script>
-import EditorView from '@/components/form/EditorView';
+import Editor from '@/components/form/Editor';
 import ProblemSubmit from '@/components/problems/ProblemSubmit';
 import Button from "@/components/form/Button";
 import ProblemForm from "@/components/problems/ProblemForm";
@@ -125,7 +122,7 @@ export default {
         ProblemForm,
         Button,
         ProblemSubmit,
-        EditorView,
-    }
-}
+        Editor,
+    },
+};
 </script>

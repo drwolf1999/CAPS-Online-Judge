@@ -109,5 +109,5 @@ export default new Vuex.Store({
         setLastSubmitLanguage(state, value) {
             state.commit('setLastSubmitLanguage', value);
         },
-    }
+    },
 });

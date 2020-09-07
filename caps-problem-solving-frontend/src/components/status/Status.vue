@@ -56,18 +56,15 @@ import Utility from '@/helper/Utility';
 export default {
     name: 'Status',
     created() {
-        this.$socket.on('result', (data) => {
-            // if (!data.success) this.$notify({
-            //     title: '에러 발생',
-            //     text: '관리자에게 연락 바랍니다.',
-            //     type: 'error',
-            // });
-            // else
-            console.log(data.Status.judge_result);
-            this.Status.splice(0, 1, data.Status);
-            if (data.Status.judge_result >= 6) setTimeout(this.$socket.emit('getStatus', {statusNumber: data.statusNumber, judge_result: data.Status.judge_result}), 1000);
+        this.$statusSocket.emit('connect');
+        this.$statusSocket.on('result', (data) => {
+            for (let i = this.Status.length - 1; i >= 0; i--) {
+                if (this.Status[i].number === data.statusNumber) {
+                    this.Status[i].judge_result = data.judge_result;
+                    break;
+                }
+            }
         });
-        this.UpdateStatus();
     },
     mounted() {
         this.FetchStatus();
@@ -107,32 +104,6 @@ export default {
                 });
         },
         UpdateStatus() {
-            if (this.Status.length > 0) {
-                const f = this.Status[0];
-                this.$socket.emit('joinStatus', {statusNumber: f.number});
-
-                this.$socket.emit('getStatus', {statusNumber: f.number, judge_result: f.judge_result});
-            }
-            // for (let i = 0; i < this.Status.length; i++) {
-            //     const f = this.Status[i];
-            //     let type = true;
-            //     if (f.judge_result >= 6) {
-            //         console.log(f.number);
-            //         this.$socket.emit('joinStatus', {statusNumber: f.number});
-            //
-            //         this.$socket.emit('getStatus', {statusNumber: f.number});
-            //
-            //         this.$socket.on('result', (data) => {
-            //             type = data.success;
-            //             if (!type) this.$notify({
-            //                 title: '에러 발생',
-            //                 text: '관리자에게 연락 바랍니다.',
-            //                 type: 'error',
-            //             });
-            //             else this.Status.splice(i, 1, data.Status);
-            //         });
-            //     }
-            // }
         },
         ViewCode(stateNumber) {
             this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
@@ -168,5 +139,9 @@ export default {
             if (n !== o) this.UpdateStatus();
         },
     },
-}
+    destroyed() {
+        this.$statusSocket.emit('disconnect');
+        this.$statusSocket.removeAllListeners();
+    },
+};
 </script>
