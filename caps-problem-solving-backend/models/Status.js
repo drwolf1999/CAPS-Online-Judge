@@ -79,8 +79,8 @@ StatusSchema.virtual('user', {
 StatusSchema.pre('save', async function (next) {
     await this
         .populate({
-        path: 'problem'
-    })
+            path: 'problem'
+        })
         .populate({
             path: 'user'
         })
@@ -95,15 +95,25 @@ StatusSchema.statics.getStatus = function (statusNumber) {
         .exec();
 };
 
-StatusSchema.statics.getAllStatus = function (page) {
+StatusSchema.statics.getAllStatus = function (top) {
     return this.find({}, null)
-        .sort({'number': -1})
+        .sort('-number')
+        .where('number').lte(top)
+        .limit(21)
         .populate('user')
         .populate('problem')
-        .skip((page - 1) * 10)
-        .limit(10)
         .exec();
 };
+
+StatusSchema.statics.getMaxNumber = async function () {
+    let infos = await this.find({}, null)
+        .sort('-number')
+        .limit(1);
+    if (infos.length === 1) {
+        return infos[0].number;
+    }
+    return 1000000;
+}
 
 StatusSchema.plugin(require('mongoose-auto-increment').plugin, {
     model: 'Status',

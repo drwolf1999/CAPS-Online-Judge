@@ -59,6 +59,20 @@ const StandingController = {
             });
         }
     },
+    GetByUser: async (username, problemNumber) => {
+        try {
+            const result = await UserProblem.find({username: username, problemNumber: problemNumber})
+                .limit(1)
+                .exec();
+            if (result.length === 1) {
+                return result[0].judge_result;
+            } else {
+                return -1;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
     SubmitUpdate: async (username, problemNumber, submissionTime) => {
         try {
             let userProblem = await UserProblem.findOne({username: username, problemNumber: problemNumber}).limit(1);

@@ -144,4 +144,8 @@ export default class Utility {
     static realNumber(number) {
         return Math.floor(number);
     }
+
+    static Max(a, b) {
+        return a > b ? a : b;
+    }
 };

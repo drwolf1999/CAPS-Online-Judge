@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-toolbar color="primary" dark class="indigo">
-            <v-app-bar-nav-icon @click="flipNav"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon v-if="isAdmin" @click="flipNav"></v-app-bar-nav-icon>
             <v-toolbar-title @click="GoHome">CAPS OJ</v-toolbar-title>
             <v-spacer></v-spacer>
             <Button v-bind:content="`문제`" v-bind:text-btn="true" v-on:click.native="GoProblem"></Button>
@@ -28,6 +28,9 @@ export default {
     computed: {
         isLogined() {
             return this.$store.getters.isLogined;
+        },
+        isAdmin() {
+            return this.$store.getters.getUserData.permission >= 1;
         }
     },
     props: {

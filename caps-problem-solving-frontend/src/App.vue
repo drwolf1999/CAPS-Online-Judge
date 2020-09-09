@@ -11,6 +11,8 @@
 </template>
 
 <style>
+a { text-decoration:none }
+
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -55,7 +57,7 @@ export default {
             return this.$store.getters.isLogined
         },
         isAdmin() {
-            return this.$store.getters.getUserData.permission >= 2;
+            return this.$store.getters.getUserData.permission >= 1;
         },
     },
     methods: {

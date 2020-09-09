@@ -7,6 +7,8 @@
                     :headers="stateHeaders"
                     :items="Status"
                     :loading="fetchingStatus"
+                    :items-per-page="20"
+                    hide-default-footer
                     item-key="number"
                     loading-text="fetching....."
                 >
@@ -29,19 +31,29 @@
                         </div>
                     </template>
                     <template v-slot:[`item.memory`]="{ item }">
-                        {{ item.judge_result === 1 ? item.memory / 1024 : '' }}
+                        <div v-if="item.judge_result === 1">{{ item.memory / 1024 }} <span class="red--text">KB</span></div>
                     </template>
                     <template v-slot:[`item.time`]="{ item }">
-                        {{ item.judge_result === 1 ? item.time : '' }}
+                        <div v-if="item.judge_result === 1">{{ item.time }} <span class="red--text">ms</span></div>
                     </template>
                     <template v-slot:[`item.language`]="{ item }">
-                        <div v-if="item.user.username === GetUserName"><a href="javascript:void(0);" @click="ViewCode(item.number)">{{ Language[item.language] }}</a></div>
-                        <div v-else>{{ Language[item.language] }}</div>
+                        <div v-if="item.user.username === GetUserName"><a href="javascript:void(0);" @click="ViewCode(item.number)">{{ Language[item.language].langName }}</a></div>
+                        <div v-else>{{ Language[item.language].langName }}</div>
                     </template>
                     <template v-slot:[`item.submit_time`]="{ item }">
                         {{ item.submit_time | dateToString }}
                     </template>
                 </v-data-table>
+                <v-divider></v-divider>
+                <div class="pt-10">
+                    <v-btn @click="PrevPage" v-if="!IsFirst" icon color="teal" tile class="ma-2" outlined large>
+                        <v-icon>mdi-chevron-left</v-icon>
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="NextPage" v-if="!IsLast" icon color="teal" tile class="ma-2" outlined large>
+                        <v-icon>mdi-chevron-right</v-icon>
+                    </v-btn>
+                </div>
             </v-card>
         </v-col>
     </v-row>
@@ -67,50 +79,63 @@ export default {
         });
     },
     mounted() {
-        this.FetchStatus();
+        this.FetchStatusSize();
+        this.FetchStatus(0);
     },
     data() {
         return {
             stateHeaders: [
-                {
-                    text: '채점 번호',
-                    align: 'center',
-                    sortable: false,
-                    value: 'number',
-                },
-                {text: '아이디', value: 'user', align: 'center',},
-                {text: '문제 번호', value: 'problem', align: 'center',},
-                {text: '결과', value: 'judge_result', align: 'center',},
-                {text: '메모리', value: 'memory', align: 'center',},
-                {text: '시간', value: 'time', align: 'center',},
-                {text: '언어', value: 'language', align: 'center',},
-                {text: '제출한 시간', value: 'submit_time', align: 'center',},
+                {text: '채점 번호', align: 'center', sortable: false, value: 'number',},
+                {text: '아이디', value: 'user', align: 'center', sortable: false,},
+                {text: '문제 번호', value: 'problem', align: 'center', sortable: false,},
+                {text: '결과', value: 'judge_result', align: 'center', sortable: false,},
+                {text: '메모리', value: 'memory', align: 'center', sortable: false,},
+                {text: '시간', value: 'time', align: 'center', sortable: false,},
+                {text: '언어', value: 'language', align: 'center', sortable: false,},
+                {text: '제출한 시간', value: 'submit_time', align: 'center', sortable: false,},
             ],
             fetchingStatus: false,
-            page: 1,
+            stateLastNumber: 0,
             Status: [],
+            nextState: null,
             updateTimer: null,
         };
     },
     methods: {
-        FetchStatus() {
+        FetchStatus(top) {
             this.Status.splice(0, this.Status.length);
-            StatusService.GetAllStatus(this.page)
+            StatusService.GetAllStatus(top)
                 .then(response => {
                     this.Status = response.data.Status;
+                    this.nextState = response.data.nextState;
                 })
                 .catch(error => {
                     console.log(error);
                 });
         },
-        UpdateStatus() {
+        FetchStatusSize() {
+            StatusService.GetMaxNumber()
+                .then(response => {
+                    this.stateLastNumber = response.data.maxNumber;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
+        PrevPage() {
+            if (this.IsFirst) return;
+            this.FetchStatus(this.LastSubmitNumber + 20);
+        },
+        NextPage() {
+            if (this.IsLast) return;
+            this.FetchStatus(this.LastSubmitNumber - 20);
         },
         ViewCode(stateNumber) {
             this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
         },
         GoProblem(problemNumber) {
             this.$router.push({name: 'ProblemView', params: {problemNumber: problemNumber}});
-        }
+        },
     },
     computed: {
         isLogined() {
@@ -125,6 +150,19 @@ export default {
         GetUserName() {
             return this.$store.getters.getUserData.username;
         },
+        LastSubmitNumber() {
+            let ret = 0;
+            for (let i = this.Status.length - 1; i >= 0; i--) {
+                ret = Utility.Max(ret, this.Status[i].number);
+            }
+            return ret;
+        },
+        IsFirst() {
+            return this.LastSubmitNumber === this.stateLastNumber;
+        },
+        IsLast() {
+            return this.nextState === undefined || this.nextState === null;
+        },
     },
     filters: {
         dateToString: function (value) {
@@ -134,11 +172,7 @@ export default {
             return Utility.TimeDigit1To2(value);
         },
     },
-    watch: {
-        Status(n, o) {
-            if (n !== o) this.UpdateStatus();
-        },
-    },
+    watch: {},
     destroyed() {
         this.$statusSocket.emit('disconnect');
         this.$statusSocket.removeAllListeners();

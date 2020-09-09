@@ -30,6 +30,7 @@
                             </v-simple-table>
                         </v-col>
                         <v-col cols="11">
+<!--                            {{ // Problem }}-->
                             <Editor v-bind:label="`문제`" v-bind:content="Problem.description" v-bind:read-only="true"/>
                         </v-col>
                         <v-col cols="11">

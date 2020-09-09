@@ -3,7 +3,7 @@
             class="text-left"
             height="500"
             theme="vs-dark"
-            :language="Language[language].toLowerCase()"
+            :language="Language[language].langType.toLowerCase()"
             :value="code"
             :options="Options"
             @change="onCodeChange"
@@ -55,6 +55,7 @@
         },
         computed: {
             Language() {
+                console.log(LanguageConstants.Language[this.language].langType);
                 return LanguageConstants.Language;
             },
             Options() {

@@ -3,7 +3,7 @@
         <v-card-title>코드</v-card-title>
         <v-row justify="center">
             <v-col cols="11">
-                <v-autocomplete v-model="selectedLanguage" :items="Language" item-value="id" item-text="language"></v-autocomplete>
+                <v-autocomplete v-model="selectedLanguage" :items="Language" item-value="id" item-text="language.langName"></v-autocomplete>
             </v-col>
         </v-row>
         <CodeEditor :language="selectedLanguage" v-bind:initial-code="code" v-on:input="onChangeCode"></CodeEditor>

@@ -158,6 +158,7 @@ export default {
         },
         DoUpdateProblem() {
             if (!this.isOKProblem()) return;
+            console.log(this.Problem.description);
             ProblemService.UpdateProblem(this.Problem.number, {
                 name: this.Problem.name,
                 memory_limit: this.Problem.memory_limit,
@@ -170,8 +171,7 @@ export default {
             })
                 .then((response) => { // eslint-disable-line
                     this.$notify({
-                        title: '문제 등록이 완료되었습니다.',
-                        text: '문제 페이지로 이동합니다.',
+                        title: '문제 수정이 완료되었습니다.',
                         type: 'success',
                     });
                     this.$emit('finished');

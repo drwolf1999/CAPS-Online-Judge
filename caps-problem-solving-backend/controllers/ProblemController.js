@@ -1,13 +1,14 @@
 const Problem = require('../models/Problem');
 const {ShellHelper} = require('../middleware/Utility');
 const {UPLOAD_DIR} = require('../constants/Path');
+const JudgeResult = require('./StandingController').GetByUser;
 
 const ProblemController = {
     Count: (req, res, next) => {
         Problem.countDocuments()
             .then(count => {
                 res.status(200).json({
-                    count: count,
+                    Count: count,
                     message: 'success',
                 });
             })
@@ -18,20 +19,25 @@ const ProblemController = {
                 });
             });
     },
-    All: (req, res, next) => {
-        Problem.getAllProblems()
-            .then(Problems => {
-                res.status(200).json({
-                    Problems: Problems,
-                    message: 'success',
-                });
-            })
-            .catch(error => {
-                res.status(500).json({
-                    error: error,
-                    message: 'fail',
-                });
-            })
+    All: async (req, res, next) => {
+        try {
+            const Problems = await Problem.getAllProblems();
+            let userJudgeResult = {};
+            for (let i = Problems.length - 1; i >= 0; i--) {
+                userJudgeResult[Problems[i].number] = await JudgeResult(req.userData.username, Problems[i].number);
+            }
+            await console.log(userJudgeResult);
+            return res.status(200).json({
+                Problems: Problems,
+                userJudgeResult: userJudgeResult,
+                message: 'success',
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: error,
+                message: 'fail',
+            });
+        }
     },
     Get: (req, res, next) => {
         Problem.getProblem(req.params.problemNumber)
