@@ -134,7 +134,7 @@ const StatusController = {
         GetInQueue: (req, res, next) => {
             Status.find()
                 .where('judge_result').equals('7')
-                .sort('-submit_time')
+                .sort('number')
                 .populate('problem')
                 .limit(1)
                 .then(status => {

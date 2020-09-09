@@ -88,12 +88,15 @@ const JudgerHelper = {
                 }
                 return 1;
                 break;
-            case 1:
+            case 1: // TLE
+                return RESULT.TLE.real;
             case 2:
-            case 3:
-            case 4:
-                return msg;
+                throw Error('undefined');
                 break;
+            case 3: // MLE
+                return RESULT.MLE.real;
+            case 4: // RE
+                return RESULT.RE.real;
             case 5:
                 return 8;
                 break;
