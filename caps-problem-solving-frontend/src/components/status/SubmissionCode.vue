@@ -37,6 +37,14 @@ export default {
             this.fetchingStatus = true;
             StatusService.GetStatus(this.submitNumber)
                 .then(response => {
+                    if (response.data.Status.username !== this.$store.getters.getUserData.username) {
+                        this.$notify({
+                            text: '비 정상적인 접근입니다.',
+                            type: 'warn',
+                        });
+                        this.$router.push('/');
+                        return;
+                    }
                     this.Status = response.data.Status;
                     this.fetchingStatus = false;
                 })

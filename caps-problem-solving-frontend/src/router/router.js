@@ -16,9 +16,17 @@ Vue.use(Router);
 
 const requireAuth = () => (from, to, next) => {
     if (store.getters.isLogined) return next(); // isAuth === true면 페이지 이동
-    console.log('do auth');
-    next('auth'); // isAuth === false면 다시 로그인 화면으로 이동
+    next('/auth'); // isAuth === false면 다시 로그인 화면으로 이동
 };
+
+const requireAdmin = () => (from, to, next) => {
+    if (!store.getters.isLogined) return next('/auth');
+    if (store.getters.getUserData.permission === 0) {
+        alert('비정상적인 접근입니다.');
+        return next('/');
+    }
+    next();
+}
 
 const index = new Router({
     mode: 'history',
@@ -46,7 +54,7 @@ const index = new Router({
             path: '/problem/create',
             name: 'CreateProblem',
             component: ProblemForm,
-            beforeEnter: requireAuth(),
+            beforeEnter: requireAdmin(),
         },
         {
             path: '/problem/view/:problemNumber',
@@ -60,14 +68,14 @@ const index = new Router({
             name: 'ProblemModify',
             component: ProblemForm,
             props: true,
-            beforeEnter: requireAuth(),
+            beforeEnter: requireAdmin(),
         },
         {
             path: '/problem/testcase/modify/:problemNumber',
             name: 'ProblemTestcase',
             component: Testcase,
             props: true,
-            beforeEnter: requireAuth(),
+            beforeEnter: requireAdmin(),
         },
         // Status
         {
@@ -95,6 +103,7 @@ const index = new Router({
             path: '/admin/rejudge',
             name: 'Rejudge',
             component: Rejudge,
+            beforeEnter: requireAdmin(),
         },
     ]
 });

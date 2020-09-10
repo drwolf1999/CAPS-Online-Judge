@@ -14,7 +14,7 @@ const enhanceAccessToken = () => {
     }
 
     // expired이면 제거
-    var current_time = Date.now() / 1000;
+    const current_time = Date.now() / 1000;
     if (jwt.decode(accessToken).exp < current_time) {
         delete localStorage.accessToken;
         return;

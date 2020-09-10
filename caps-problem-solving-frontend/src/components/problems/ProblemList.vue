@@ -3,7 +3,7 @@
         <v-col cols="11">
             <v-card md-with-hover>
                 <v-card-title>
-                    문제 목록 ({{ ProblemCount }})
+                    문제 목록 ({{ Problems.length }})
                     <v-spacer></v-spacer>
                     <Input v-bind:data="Query" v-on:input="onChangeQuery"/>
                 </v-card-title>
@@ -13,7 +13,7 @@
                         <tr>
                             <th class="text-left" style="width: 20%;">문제 번호</th>
                             <th class="text-left" style="width: 40%;">제목</th>
-                            <th class="text-center" style="width: 20%;">정보</th>
+                            <th class="text-left" style="width: 20%;">정보</th>
                             <th class="text-center" style="width: 10%;">맞은 사람</th>
                             <th class="text-center" style="width: 10%;">제출 수</th>
                         </tr>
