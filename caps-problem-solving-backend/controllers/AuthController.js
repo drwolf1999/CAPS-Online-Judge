@@ -67,6 +67,8 @@ const AuthController = {
                     let auth = new Auth({
                         username: req.body.username,
                         password: hash,
+                        realName: req.body.realName,
+                        grade: req.body.grade,
                     });
                     auth.save()
                         .then(user => {
