@@ -23,6 +23,21 @@
 
                             </v-row>
                         </v-col>
+                        <v-col cols="11" class="text-left">
+                            <v-btn
+                                absolute
+                                dark
+                                fab
+                                top
+                                right
+                                icon
+                                color="black"
+                            >
+                                <a target="_blank" style="color: inherit;" href="https://katex.org/" title="본 COJ는 katex문법을 통해 수식을 생성합니다. 이 링크를 통해 수식을 추가하는 법을 읽어보세요.">
+                                    <v-icon>mdi-progress-question</v-icon>
+                                </a>
+                            </v-btn>
+                        </v-col>
                         <v-col cols="11">
                             <Editor v-bind:label="`문제`" v-bind:content="Problem.description" v-on:input="onChangeDescription"/>
                         </v-col>
