@@ -68,7 +68,7 @@ class LocalStorage {
         }
     }
 
-    async getFile(dir, path, part) {
+    async getFilePartial(dir, path, part) {
         try {
             let start = part * 2000;
             const fPath = this.root + '/' + dir + path;
@@ -95,6 +95,9 @@ class LocalStorage {
         }
     }
 
+    async getFile(dir, path) {
+        return fs.createReadStream(this.root + '/' + dir + path);
+    }
 
     async upload(path, files, dir) {
         try {

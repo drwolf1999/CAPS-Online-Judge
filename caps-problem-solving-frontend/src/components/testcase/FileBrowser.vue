@@ -93,6 +93,7 @@ const endpoints = {
     upload: { url: "/storage/{storage}/{problemNumber}/upload?path={path}", method: "post" },
     mkdir: { url: "/storage/{storage}/{problemNumber}/mkdir?path={path}", method: "post" },
     delete: { url: "/storage/{storage}/{problemNumber}/delete?path={path}", method: "post" },
+    downloads: { url: "/storage/{storage}/{problemNumber}/download?path={path}", method: "get" },
 };
 const fileIcons = {
     zip: "mdi-folder-zip-outline",

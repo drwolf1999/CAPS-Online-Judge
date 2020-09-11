@@ -62,6 +62,9 @@
                     </v-list-item-content>
 
                     <v-list-item-action>
+                        <v-btn icon @click.stop="downloadItem(item)">
+                            <v-icon color="grey lighten-1">mdi-cloud-download-outline</v-icon>
+                        </v-btn>
                         <v-btn icon @click.stop="deleteItem(item)">
                             <v-icon color="grey lighten-1">mdi-delete-outline</v-icon>
                         </v-btn>
@@ -201,6 +204,26 @@ export default {
                 this.pathFile = response.data.content;
                 this.readMore = response.data.canReadMore;
             }
+            this.$emit("loading", false);
+        },
+        async downloadItem(item) {
+            this.$emit('loading', true);
+            let url = this.endpoints.downloads.url
+                .replace(new RegExp("{problemNumber}", "g"), this.defaultPath)
+                .replace(new RegExp("{storage}", "g"), this.storage)
+                .replace(new RegExp("{path}", "g"), item.path);
+            let config = {
+                url,
+                method: this.endpoints.downloads.method || "post",
+            };
+            let response = await this.axios.request(config);
+            const url1 = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url1;
+            link.setAttribute('download', item.basename);
+            document.body.appendChild(link);
+            link.click();
+            this.$emit("file-deleted");
             this.$emit("loading", false);
         },
         async deleteItem(item) {

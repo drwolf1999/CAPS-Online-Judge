@@ -19,8 +19,15 @@ module.exports = function (storages, options = {}) {
         });
 
         router.get(`/${storage.code}/:problemNumber/get`, isLoginSession, async function (req, res) {
-            const result = await storage.getFile(req.params.problemNumber, req.query.path, req.query.part);
+            const result = await storage.getFilePartial(req.params.problemNumber, req.query.path, req.query.part);
             return res.json(result);
+        });
+
+        router.get(`/${storage.code}/:problemNumber/download`, isLoginSession, async function (req, res) {
+            const result = await storage.getFile(req.params.problemNumber, req.query.path);
+            res.setHeader('content-type', 'blob');
+            console.log('get file');
+            result.pipe(res);
         });
 
         // `mkdir` endpoint
