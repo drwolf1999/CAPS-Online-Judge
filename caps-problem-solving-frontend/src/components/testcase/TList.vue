@@ -153,7 +153,7 @@ export default {
             );
         },
         isDir() {
-            return this.path[this.path.length - 1] === "/";
+            return this.path === '' || this.path[this.path.length - 1] === "/";
         },
         isFile() {
             return !this.isDir;

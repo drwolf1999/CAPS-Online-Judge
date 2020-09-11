@@ -73,10 +73,13 @@ class LocalStorage {
             let start = part * 2000;
             const fPath = this.root + '/' + dir + path;
             const fStat = await stat(fPath);
-            let canReadMore = false, size = fStat.size - (start + 2000);
+            let canReadMore = false, size = fStat.size;
             if (fStat.size >= start + 2000) {
                 canReadMore = true;
                 size = 2000;
+            } else if (fStat.size < start) {
+                start = 0;
+                size = fStat.size;
             }
             let fd = await open(fPath, 'r');
             let buf = Buffer.alloc(size);
