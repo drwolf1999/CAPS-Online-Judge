@@ -44,17 +44,13 @@
                                 <v-col cols="6">
                                     <v-card class="pa-2" outlined tile>
                                         <v-card-subtitle class="text-left">예제 입력 {{ index + 1 }}</v-card-subtitle>
-                                        <p class="text-left">
-                                            {{ example.input }}
-                                        </p>
+                                        <p class="text-left" :inner-html.prop="example.input | newline"></p>
                                     </v-card>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-card class="pa-2" outlined tile>
                                         <v-card-subtitle class="text-left">예제 출력 {{ index + 1 }}</v-card-subtitle>
-                                        <p class="text-left">
-                                            {{ example.output }}
-                                        </p>
+                                        <div class="text-left" :inner-html.prop="example.output | newline"></div>
                                     </v-card>
                                 </v-col>
                             </v-row>
@@ -118,6 +114,11 @@ export default {
             this.isModifying = false;
             this.$store.dispatch('fetchProblem', this.ProblemNumber);
         },
+    },
+    filters: {
+        newline(text) {
+            return text.replace(/\n/g, '<br>');
+        }
     },
     components: {
         ProblemForm,

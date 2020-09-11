@@ -3,11 +3,15 @@ const Auth = require('../models/Auth');
 const CONTEST_START = new Date('2020-09-03 01:30:00 GMT+09:00');
 
 function Penalty(O) {
-    const d1 = new Date(O.lastSubmit_time);
-    const T = Math.abs(d1.getTime() - CONTEST_START.getTime()) / 1000 / 60;
-    const R = 20 * (O.submit_count - 1);
-    const G = 0;
-    return (O.judge_result === 1 ? 1 : 0) * (T + R + G);
+    console.log(process.env.CONTEST_MOD);
+    if (process.env.CONTEST_MOD) {
+        const d1 = new Date(O.lastSubmit_time);
+        const T = Math.abs(d1.getTime() - CONTEST_START.getTime()) / 1000 / 60;
+        const R = 20 * (O.submit_count - 1);
+        const G = 0;
+        return (O.judge_result === 1 ? 1 : 0) * (T + R + G);
+    }
+    return 0;
 }
 
 const StandingController = {

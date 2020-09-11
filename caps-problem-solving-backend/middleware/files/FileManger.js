@@ -1,11 +1,13 @@
 const os = require("os"),
     nodePath = require("path"),
-    fsPromises = require("fs").promises,
-    readdir = fsPromises.readdir,
-    stat = fsPromises.stat,
-    rename = fsPromises.rename,
-    unlink = fsPromises.unlink,
-    lstat = fsPromises.lstat,
+    fs = require("fs"),
+    readdir = fs.readdirSync,
+    stat = fs.statSync,
+    rename = fs.renameSync,
+    unlink = fs.unlinkSync,
+    lstat = fs.lstatSync,
+    open = fs.openSync,
+    read = fs.readSync,
     util = require("util"),
     rimraf = util.promisify(require("rimraf"));
 
@@ -31,7 +33,7 @@ class LocalStorage {
                 path += "/";
             }
             console.log(this.root + '/' + dir + path);
-            let items = await readdir(this.root + '/' + dir + path, { withFileTypes: true });
+            let items = await readdir(this.root + '/' + dir + path, {withFileTypes: true});
 
             for (let item of items) {
                 let isFile = item.isFile(),
@@ -66,6 +68,34 @@ class LocalStorage {
         }
     }
 
+    async getFile(dir, path, part) {
+        try {
+            let start = part * 2000;
+            const fPath = this.root + '/' + dir + path;
+            const fStat = await stat(fPath);
+            let canReadMore = false, size = fStat.size - (start + 2000);
+            if (fStat.size >= start + 2000) {
+                canReadMore = true;
+                size = 2000;
+            }
+            let fd = await open(fPath, 'r');
+            let buf = Buffer.alloc(size);
+            const res = await read(fd, buf, 0, size, start);
+            if (!res) return {
+                content: null,
+                canReadMore: false,
+            };
+            const content = buf.toString('utf-8');
+            return {
+                content: content,
+                canReadMore: canReadMore,
+            };
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
     async upload(path, files, dir) {
         try {
             for (let file of files) {
@@ -78,7 +108,7 @@ class LocalStorage {
 
     async mkdir(path, dir) {
         console.log(this.root + '/' + dir + path);
-        await fsPromises.mkdir(this.root + '/' + dir + path, { recursive: true });
+        await fsPromises.mkdir(this.root + '/' + dir + path, {recursive: true});
     }
 
     async delete(path, dir) {

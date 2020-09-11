@@ -13,9 +13,11 @@
                         <tr>
                             <th class="text-center">등수</th>
                             <th class="text-center">아이디</th>
-                            <th class="text-center" v-for="(problem, index) in Problems" v-bind:key="problem.number">
-                                <a style="text-decoration:none;" href="javascript:void(0);" @click="goProblem(problem.number)">{{ index + 1 | numberToAlphabet }}</a>
-                            </th>
+                            <template v-if="IsContestMOD">
+                                <th class="text-center" v-for="(problem, index) in Problems" v-bind:key="problem.number">
+                                    <a style="text-decoration:none;" href="javascript:void(0);" @click="goProblem(problem.number)">{{ index + 1 | numberToAlphabet }}</a>
+                                </th>
+                            </template>
                             <th class="text-center">점수(+penalty)</th>
                         </tr>
                         </thead>
@@ -23,9 +25,11 @@
                         <tr v-for="(user, index) in Users" v-bind:key="user.username">
                             <td>{{ index + 1 }}</td>
                             <td>{{ user.username }}</td>
-                            <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.username, problem.number)">
-                                {{ GetAttempt(user.username, problem.number) }}
-                            </td>
+                            <template v-if="IsContestMOD">
+                                <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.username, problem.number)">
+                                    {{ GetAttempt(user.username, problem.number) }}
+                                </td>
+                            </template>
                             <td>{{ user.score | realNumber }}</td>
                         </tr>
                         </tbody>
@@ -57,7 +61,11 @@ export default {
             fetchingRanking: 2,
         };
     },
-    computed: {},
+    computed: {
+        IsContestMOD() {
+            return process.env.VUE_APP_CONTEST_MOD;
+        },
+    },
     methods: {
         isIn(username, problemNumber) {
             if (!(username in this.Standing)) return false;

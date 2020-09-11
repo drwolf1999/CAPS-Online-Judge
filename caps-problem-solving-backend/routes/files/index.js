@@ -18,6 +18,11 @@ module.exports = function (storages, options = {}) {
             return res.sendStatus(200);
         });
 
+        router.get(`/${storage.code}/:problemNumber/get`, isLoginSession, async function (req, res) {
+            const result = await storage.getFile(req.params.problemNumber, req.query.path, req.query.part);
+            return res.json(result);
+        });
+
         // `mkdir` endpoint
         router.post(`/${storage.code}/:problemNumber/mkdir`, isLoginSession, async function (req, res) {
             await storage.mkdir(req.query.path, req.params.problemNumber);

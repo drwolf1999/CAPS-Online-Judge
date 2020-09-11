@@ -16,6 +16,7 @@ Vue.config.productionTip = false;
 Vue.use(VueNotifications);
 Vue.use(VueQuill);
 Vue.prototype.$statusSocket = IO(RestAPI.SERVER_DOMAIN + IO_STATUS_URL);
+Vue.prototype.$contestMOD = true;
 
 new Vue({
     vuetify,

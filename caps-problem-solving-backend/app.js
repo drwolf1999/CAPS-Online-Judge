@@ -6,8 +6,16 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 const constantsSecret = require('./constants/Secret.js');
+const dotenv = require('dotenv');
 
 require('./middleware/passport/passport')(passport);
+
+dotenv.config({
+    path: path.resolve(
+        process.cwd(),
+        process.env.NODE_ENV === "production" ? ".env" : ".env.dev"
+    )
+});
 
 /**
  * DB 설정
@@ -43,7 +51,7 @@ let app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

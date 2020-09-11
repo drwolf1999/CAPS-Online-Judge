@@ -89,9 +89,10 @@ const availableStorages = [
 ];
 const endpoints = {
     list: { url: "/storage/{storage}/{problemNumber}/list?path={path}", method: "get" },
+    get: { url: "/storage/{storage}/{problemNumber}/get?path={path}&part={part}", method: "get" },
     upload: { url: "/storage/{storage}/{problemNumber}/upload?path={path}", method: "post" },
     mkdir: { url: "/storage/{storage}/{problemNumber}/mkdir?path={path}", method: "post" },
-    delete: { url: "/storage/{storage}/{problemNumber}/delete?path={path}", method: "post" }
+    delete: { url: "/storage/{storage}/{problemNumber}/delete?path={path}", method: "post" },
 };
 const fileIcons = {
     zip: "mdi-folder-zip-outline",
