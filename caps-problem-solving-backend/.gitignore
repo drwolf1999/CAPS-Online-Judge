@@ -2,3 +2,4 @@ node_modules
 .idea
 node_module/*
 .idea/*
+.env*
