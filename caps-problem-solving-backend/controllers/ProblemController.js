@@ -27,6 +27,7 @@ const ProblemController = {
                 userJudgeResult[Problems[i].number] = await JudgeResult(req.userData.username, Problems[i].number);
             }
             await console.log(userJudgeResult);
+            console.log(Problems);
             return res.status(200).json({
                 Problems: Problems,
                 userJudgeResult: userJudgeResult,

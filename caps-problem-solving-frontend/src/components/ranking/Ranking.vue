@@ -18,7 +18,11 @@
                                     <a style="text-decoration:none;" href="javascript:void(0);" @click="goProblem(problem.number)">{{ index + 1 | numberToAlphabet }}</a>
                                 </th>
                             </template>
-                            <th class="text-center">점수(+penalty)</th>
+                            <th class="text-center">점수{{ IsContestMOD ? '(+penalty)' : '' }}</th>
+                            <template v-if="!IsContestMOD">
+                                <th class="text-center">정답 수</th>
+                                <th class="text-center">제출 수</th>
+                            </template>
                         </tr>
                         </thead>
                         <tbody>
@@ -26,11 +30,15 @@
                             <td>{{ index + 1 }}</td>
                             <td>{{ user.username }}</td>
                             <template v-if="IsContestMOD">
-                                <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.username, problem.number)">
-                                    {{ GetAttempt(user.username, problem.number) }}
+                                <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.problem, problem.number)">
+                                    {{ GetAttempt(user.problem, problem.number) }}
                                 </td>
                             </template>
                             <td>{{ user.score | realNumber }}</td>
+                            <template v-if="!IsContestMOD">
+                                <td class="text-center">{{ user.answers }}</td>
+                                <td class="text-center">{{ user.submits }}</td>
+                            </template>
                         </tr>
                         </tbody>
                     </template>
@@ -63,24 +71,28 @@ export default {
     },
     computed: {
         IsContestMOD() {
-            return process.env.VUE_APP_CONTEST_MOD;
+            return process.env.VUE_APP_CONTEST_MOD === 'true';
         },
     },
     methods: {
-        isIn(username, problemNumber) {
-            if (!(username in this.Standing)) return false;
-            if (!(problemNumber in this.Standing[username])) return false;
-            return true;
+        getUserProblem(userProblems, problemNumber) {
+            for (let i = userProblems.length - 1; i >= 0; i--) {
+                if (userProblems[i].number === problemNumber) {
+                    return userProblems[i];
+                }
+            }
+            return null;
         },
-        GetColor(username, problemNumber) {
-            if (!this.isIn(username, problemNumber)) return null;
-            const res = this.Standing[username][problemNumber].judge_result;
+        GetColor(userProblems, problemNumber) {
+            const userProblem = this.getUserProblem(userProblems, problemNumber);
+            if (userProblem === undefined || userProblem === null) return null;
+            const res = userProblem.judge_result;
             return SubmitConstants.Result[res].class;
         },
-        GetAttempt(username, problemNumber) {
-            if (!this.isIn(username, problemNumber)) return '';
-            const s = this.Standing[username][problemNumber];
-            return -(s.submit_count - 1);
+        GetAttempt(userProblems, problemNumber) {
+            const userProblem = this.getUserProblem(userProblems, problemNumber);
+            if (userProblem === undefined || userProblem === null) return '';
+            return -(userProblem.submit_count - 1);
         },
         onChangeQuery(value) {
             this.Query = value;
@@ -93,6 +105,7 @@ export default {
             ProblemService.GetAllProblems()
                 .then(response => {
                     this.Problems = response.data.Problems;
+                    // console.log(this.Problems);
                     this.fetchingRanking++;
                 })
                 .catch(error => {
@@ -105,6 +118,7 @@ export default {
                 .then(response => {
                     this.Standing = response.data.Standing;
                     this.Users = response.data.Users;
+                    console.log(this.Users);
                     this.fetchingRanking++;
                 })
                 .catch(error => {

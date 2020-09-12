@@ -1,58 +1,90 @@
 const UserProblem = require('../models/UserProblem');
 const Auth = require('../models/Auth');
-const CONTEST_START = new Date('2020-09-03 01:30:00 GMT+09:00');
+const CONTEST_START = new Date(process.env.CONTEST_TIME);
 
-function Penalty(O) {
-    console.log(process.env.CONTEST_MOD);
-    if (process.env.CONTEST_MOD) {
-        const d1 = new Date(O.lastSubmit_time);
-        const T = Math.abs(d1.getTime() - CONTEST_START.getTime()) / 1000 / 60;
-        const R = 20 * (O.submit_count - 1);
-        const G = 0;
-        return (O.judge_result === 1 ? 1 : 0) * (T + R + G);
-    }
-    return 0;
-}
+const IsContestMOD = process.env.CONTEST_MOD === 'true';
+
 
 const StandingController = {
     All: async (req, res, next) => {
         try {
-            const allUser = await Auth.find({}).exec();
-            const info = await UserProblem.find({}).populate('problem').exec();
-            let standing = {}, users = [];
-            for (let i = 0; i < info.length; i++) {
-                if (!(info[i].username in standing)) {
-                    standing[info[i].username] = {};
-                    standing[info[i].username][info[i].problemNumber] = {};
-                }
-                standing[info[i].username][info[i].problemNumber] = {
-                    score: info[i].problem.score,
-                    judge_result: info[i].judge_result,
-                    submit_count: info[i].submit_count,
-                    notAC_count: info[i].notAC_count,
-                    penalty: Penalty(info[i]),
+            let Users;
+            let Group;
+            if (IsContestMOD) {
+                Group = {
+                    _id: '$username',
+                    username: {$first: '$username'},
+                    score: {
+                        $sum: {
+                            $multiply: [
+                                '$judge_result',
+                                {
+                                    $max: [
+                                        0,
+                                        {
+                                            $subtract: [
+                                                '$problem.score',
+                                                {
+                                                    $add: [
+                                                        {
+                                                            $subtract: [
+                                                                '$lastSubmit_time',
+                                                                CONTEST_START
+                                                            ]
+                                                        },
+                                                        {
+                                                            $multiply: [
+                                                                20,
+                                                                '$submit_count'
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    answers: {$sum: '$judge_result'},
+                    submits: {$sum: '$submit_count'},
+                    problem: {
+                        $push: {
+                            number: '$problemNumber',
+                            judge_result: '$judge_result',
+                            submit_count: '$submit_count',
+                        }
+                    }
+                };
+            } else {
+                Group = {
+                    _id: '$username',
+                    username: {$first: '$username'},
+                    score: {
+                        $sum: {
+                            $multiply: [
+                                '$problem.score',
+                                '$judge_result'
+                            ]
+                        }
+                    },
+                    answers: {$sum: '$judge_result'},
+                    submits: {$sum: '$submit_count'},
                 };
             }
-            for (let i = 0; i < allUser.length; i++) {
-                let score = 0, solved_count = 0;
-                if (allUser[i].username in standing) {
-                    for (let j in standing[allUser[i].username]) {
-                        score += Math.max(standing[allUser[i].username][j].judge_result === 1 ? standing[allUser[i].username][j].score - standing[allUser[i].username][j].penalty : 0, 0);
-                        solved_count += standing[allUser[i].username][j].judge_result === 1 ? 1 : 0;
-                    }
-                }
-                users.push({
-                    username: allUser[i].username,
-                    score: score,
-                });
-            }
-            users.sort((a, b) => {
-                if (a.score === b.score) return -(a.score - b.score);
-                return -(a.score - b.score);
-            });
+            Users = await UserProblem.aggregate()
+                .lookup({
+                    from: 'problems',
+                    localField: 'problemNumber',
+                    foreignField: 'number',
+                    as: 'problem',
+                })
+                .unwind('problem')
+                .group(Group)
+                .sort('-score -answers submits');
             return res.status(200).json({
-                Standing: standing,
-                Users: users,
+                Users: Users,
                 message: 'success',
             });
         } catch (error) {
