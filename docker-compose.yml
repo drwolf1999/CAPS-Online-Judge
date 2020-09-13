@@ -6,6 +6,7 @@ services:
     build: ./caps-problem-solving-backend
     volumes:
       - /Users/doyeopkim/data/testcase:/data/testcase
+      - /Users/doyeopkim/data/profile:/data/profile
     ports:
       - "3000:3000"
       - "8443:8443"

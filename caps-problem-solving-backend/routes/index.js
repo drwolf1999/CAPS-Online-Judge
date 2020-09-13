@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const {isLoginSession} = require('../middleware/passport/auth');
 
+const authRouter = require('./auth');
+const profile = require('./profile');
 const problemRouter = require('./problem');
 const statusRouter = require('./status');
-const authRouter = require('./auth');
 const standingRouter = require('./standing');
 const judgeRouter = require('./forJudge');
 const fileRouter = require('./files');
@@ -16,20 +18,21 @@ router.get('/', function (req, res, next) {
     });
 });
 
-router.use('/problem', problemRouter);
-router.use('/status', statusRouter);
 router.use('/auth', authRouter);
-router.use('/standing', standingRouter);
+router.use('/problem', isLoginSession, problemRouter);
+router.use('/status', isLoginSession, statusRouter);
+router.use('/standing', isLoginSession, standingRouter);
+router.use('/profile', isLoginSession, profile);
 router.use('/for/judgement/secure', judgeRouter);
 
 const LocalStorage = require('../middleware/files/FileManger');
 const path = require('path');
-const { UPLOAD_DIR } = require('../constants/Path');
+const {TC_DIR} = require('../constants/Path');
 router.use('/storage', fileRouter([
-        new LocalStorage(path.resolve(UPLOAD_DIR, "./"))
+        new LocalStorage(path.resolve(TC_DIR, "./"))
     ],
     {
-        uploadPath: path.resolve(UPLOAD_DIR, "./upload")
+        uploadPath: path.resolve(TC_DIR, "./upload")
     }));
 
 module.exports = router;

@@ -28,7 +28,12 @@
                         <tbody>
                         <tr v-for="(user, index) in Users" v-bind:key="user.username">
                             <td>{{ index + 1 }}</td>
-                            <td>{{ user.username }}</td>
+                            <td>
+                                <router-link
+                                    :to="{name: 'Profile', params: {username: user.username}}">
+                                    {{ user.username }}
+                                </router-link>
+                            </td>
                             <template v-if="IsContestMOD">
                                 <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.problem, problem.number)">
                                     {{ GetAttempt(user.problem, problem.number) }}
@@ -105,7 +110,6 @@ export default {
             ProblemService.GetAllProblems()
                 .then(response => {
                     this.Problems = response.data.Problems;
-                    // console.log(this.Problems);
                     this.fetchingRanking++;
                 })
                 .catch(error => {
@@ -118,7 +122,6 @@ export default {
                 .then(response => {
                     this.Standing = response.data.Standing;
                     this.Users = response.data.Users;
-                    console.log(this.Users);
                     this.fetchingRanking++;
                 })
                 .catch(error => {

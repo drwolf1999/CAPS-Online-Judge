@@ -1,7 +1,7 @@
 const Problem = require('../models/Problem');
 const {ShellHelper} = require('../middleware/Utility');
 const {UPLOAD_DIR} = require('../constants/Path');
-const JudgeResult = require('./StandingController').GetByUser;
+const JudgeResult = require('./StandingController').GetByUserProblem;
 
 const ProblemController = {
     Count: (req, res, next) => {
@@ -26,8 +26,6 @@ const ProblemController = {
             for (let i = Problems.length - 1; i >= 0; i--) {
                 userJudgeResult[Problems[i].number] = await JudgeResult(req.userData.username, Problems[i].number);
             }
-            await console.log(userJudgeResult);
-            console.log(Problems);
             return res.status(200).json({
                 Problems: Problems,
                 userJudgeResult: userJudgeResult,

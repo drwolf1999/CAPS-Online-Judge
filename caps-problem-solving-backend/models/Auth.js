@@ -24,6 +24,18 @@ let AuthSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
+    profile_url: {
+        type: String,
+        required: true,
+        default: null,
+    },
+    profile_type: {
+        type: String,
+    },
+    statusMessage: {
+        type: String,
+        default: '.',
+    },
     realName: {
         type: String,
         required: true,

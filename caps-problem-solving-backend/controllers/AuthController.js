@@ -4,6 +4,8 @@ const Auth = require('../models/Auth');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Secret = require('../middleware/Secret.js');
+const fs = require('fs');
+
 const AuthController = {
     Login: (req, res, next) => {
         Auth.find({})
@@ -85,6 +87,68 @@ const AuthController = {
                 }
             })
         });
+    },
+    Profile: async (req, res, next) => {
+        try {
+            const Profile = await Auth.findOne({username: req.params.username})
+                .select('-password -profile_url -profile_type');
+            return res.status(200).json({
+                Profile: Profile,
+                find: Profile !== null,
+                message: 'success',
+            })
+        } catch (error) {
+            return res.status(500).json({
+                error: error,
+                message: 'fail..',
+            });
+        }
+    },
+    ProfileUpdate: async (req, res, next) => {
+        try {
+            console.log(req.files);
+            console.log(req.body);
+            let ARGS = {
+                permission: req.body.permission,
+                statusMessage: req.body.statusMessage,
+            };
+            if (req.files.length > 0) {
+                ARGS.profile_url = req.files[0].path;
+                ARGS.profile_type = req.files[0].mimetype;
+            }
+            const Profile = await Auth.findOneAndUpdate({username: req.params.username}, ARGS, {new: true});
+            return res.status(201).json({
+                Profile: Profile,
+                message: 'success',
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: error,
+                message: 'fail...',
+            });
+        }
+    },
+    ProfileImage: async (req, res, next) => {
+        try {
+            let Profile = await Auth.findOne({username: req.params.username})
+                .select('-password');
+            if (!Profile) {
+                return res.status(404).json(null);
+            }
+            if (Profile.profile_url === undefined || Profile.profile_url === null) {
+                return res.status(200).json(null);
+            }
+            const img = fs.readFileSync(Profile.profile_url, 'base64');
+            res.status(200);
+            res.writeHead(200, {'Content-Type': Profile.profile_type });
+            res.end(img, 'binary');
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                error: error,
+                message: 'fail..',
+            });
+        }
     },
 };
 

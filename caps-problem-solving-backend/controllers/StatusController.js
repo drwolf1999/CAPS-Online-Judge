@@ -118,7 +118,7 @@ const StatusController = {
                 }
             })
                 .exec();
-            await UserProblemUpdate.SubmitUpdate(req.body.username, req.body.problem, status.submit_time);
+            await UserProblemUpdate.ResultUpdate(req.body.username, req.body.problem, status.submit_time, null);
             return res.status(200).json({
                 Status: status,
                 message: 'success',

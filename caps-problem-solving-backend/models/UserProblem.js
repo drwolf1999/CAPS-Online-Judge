@@ -31,6 +31,10 @@ let UserProblemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Date,
         required: true,
     },
+    penalty: {
+        type: Number,
+        default: 0,
+    }
 });
 
 UserProblemSchema.virtual('problem', {

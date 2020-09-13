@@ -1,5 +1,6 @@
-const UPLOAD_DIR = '/data/testcase';
-
+const TC_DIR = '/data/testcase';
+const PROFILE_DIR = '/data/profile';
 module.exports = {
-    UPLOAD_DIR: UPLOAD_DIR,
+    TC_DIR: TC_DIR,
+    PROFILE_DIR: PROFILE_DIR,
 };

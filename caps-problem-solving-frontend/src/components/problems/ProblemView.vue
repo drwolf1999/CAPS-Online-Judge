@@ -74,7 +74,7 @@
         </v-col>
         <v-col v-else>
             <v-sheet :color="`lighten-4`" class="px-10 pt-10 pb-10">
-                <v-skeleton-loader class="mx-auto" max-width="500" type="card"></v-skeleton-loader>
+                <v-skeleton-loader class="mx-auto" type="card"></v-skeleton-loader>
             </v-sheet>
         </v-col>
     </v-row>

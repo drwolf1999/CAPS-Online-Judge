@@ -16,7 +16,11 @@
                         <a href="javascript:void(0);" @click="GoProblem(item.problem.number)">{{ item.problem.number }}</a>
                     </template>
                     <template v-slot:[`item.user`]="{ item }">
-                        {{ item.user.username }}
+                        <router-link
+                            :to="{name: 'Profile', params: {username: item.user.username}}"
+                        >
+                            {{ item.user.username }}
+                        </router-link>
                     </template>
                     <template v-slot:[`item.judge_result`]="{ item }">
                         <div :style="`vertical-align: middle;color:` + Result[item.judge_result].color">

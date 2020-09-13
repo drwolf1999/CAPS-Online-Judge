@@ -10,4 +10,10 @@ export default {
                 console.log(error);
             });
     },
+    GetUser(username) {
+        return axios.get(RestAPI.SERVER_DOMAIN + 'standing/get/' + username)
+            .catch(error => {
+                console.log(error);
+            });
+    },
 };

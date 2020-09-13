@@ -11,6 +11,7 @@ import store from '@/store/store.js';
 import Ranking from "@/components/ranking/Ranking.vue";
 import Testcase from "@/components/testcase/Testcase.vue";
 import Rejudge from "@/components/DangerZone/Rejudge.vue";
+import Profile from "@/components/profile/Profile";
 
 Vue.use(Router);
 
@@ -42,6 +43,13 @@ const index = new Router({
             path: '/auth',
             name: 'Auth',
             component: Auth,
+        },
+        {
+            path: '/profile/:username',
+            name: 'Profile',
+            component: Profile,
+            props: true,
+            beforeEnter: requireAuth(),
         },
         // Problem
         {
