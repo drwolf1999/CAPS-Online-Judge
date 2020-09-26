@@ -11,7 +11,7 @@
                                 color="white"
                                 v-if="ProfileImage"
                             >
-                                <v-img v-if="" v-bind:src="`data:image/png;base64,` + ProfileImage"></v-img>
+                                <v-img v-bind:src="`data:image/png;base64,` + ProfileImage"></v-img>
                             </v-list-item-avatar>
                             <v-list-item-avatar
                                 size="80"
@@ -19,9 +19,8 @@
                                 v-else-if="!ModifyMod"
                             ></v-list-item-avatar>
                             <v-list-item-avatar size="80" color="grey" v-else @click="$refs.profileImage.click()"></v-list-item-avatar>
-
                             <v-list-item-content class="text-left">
-                                <div class="overline mb-4">{{ Profile.username }}</div>
+                                <blockquote class="rainbow">{{ Profile.username }}</blockquote>
                                 <v-list-item-title class="headline mb-1">{{ Profile.realName }}</v-list-item-title>
                                 <v-list-item-subtitle v-if="!ModifyMod">{{ Profile.statusMessage }}</v-list-item-subtitle>
                                 <v-list-item-subtitle v-else>
@@ -62,13 +61,30 @@
                 </v-col>
                 <v-col cols="7">
                     <v-card>
+                        <v-card-title>업적</v-card-title>
+                        <v-card-text>
+                            <v-row justify="start">
+                                <v-col class="text-left">
+                                    <v-chip-group column>
+                                        <v-chip color="#00E676" text-color="white">1등팀</v-chip>
+                                        <v-chip color="#00E676" text-color="white">32기 대표</v-chip>
+                                        <v-chip color="#00E676" text-color="white">1회 우승팀</v-chip>
+                                        <v-chip color="#00E676" text-color="white">foo</v-chip>
+                                        <v-chip color="#00E676" text-color="white">bar</v-chip>
+                                        <v-chip color="#00E676" text-color="white">chi</v-chip>
+                                    </v-chip-group>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                    <v-card>
                         <v-card-title>제출 기록</v-card-title>
                         <v-card-text>
                             <v-row justify="start">
                                 <v-col class="text-left">
                                     <router-link
                                         :class="`pa-1 `"
-                                        :style="`color: ` + Result[problem.judge_result].color"
+                                        :style="GetMyResult(problem.number) !== -1 ? `color: ` + Result[GetMyResult(problem.number)].color : ``"
                                         v-for="problem in Standing.problems"
                                         :key="problem.number" :to="`/problem/view/` + problem.number"
                                     >{{ problem.number }}
@@ -98,6 +114,7 @@ export default {
     components: {Button},
     props: ['username'],
     mounted() {
+        this.$store.dispatch('fetchStanding', this.$store.getters.getUserData.username);
         this.FetchProfile();
         this.FetchStanding();
         this.FetchProfileImage();
@@ -113,7 +130,7 @@ export default {
     },
     computed: {
         IsLoginedUser() {
-            if (this.Profile === null || this.$store.getters.getUserData.username) return false;
+            if (this.Profile === null || this.$store.getters.getUserData === null || this.$store.getters.getUserData.username === null) return false;
             return this.$store.getters.getUserData.username === this.Profile.username;
         },
         IsLoaded() {
@@ -122,8 +139,15 @@ export default {
         Result() {
             return SubmitConstants.Result;
         },
+        MyStanding() {
+            return this.$store.getters.getStanding;
+        }
     },
     methods: {
+        GetMyResult(problemNumber) {
+            if (problemNumber in this.MyStanding.problems) return this.MyStanding.problems[problemNumber];
+            return -1;
+        },
         SetProfileImage() {
             this.Profile.profileImage = this.$refs.profileImage.files[0];
         },
@@ -171,6 +195,13 @@ export default {
                 });
         },
     },
+    watch: {
+        username() {
+            this.FetchProfile();
+            this.FetchStanding();
+            this.FetchProfileImage();
+        },
+    }
 };
 </script>
 
@@ -181,5 +212,11 @@ tbody
 /deep/
 tr:hover:not(.v-data-table__expanded__content) {
     background: #ffffff !important;
+}
+
+.rainbow {
+    background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo);
+    -webkit-background-clip: text;
+    color: transparent;
 }
 </style>

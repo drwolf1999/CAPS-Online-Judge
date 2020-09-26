@@ -4,10 +4,22 @@
             <v-app-bar-nav-icon v-if="isAdmin" @click="flipNav"></v-app-bar-nav-icon>
             <v-toolbar-title @click="GoHome">CAPS OJ</v-toolbar-title>
             <v-spacer></v-spacer>
-            <Button v-bind:content="`문제`" v-bind:text-btn="true" v-on:click.native="GoProblem"></Button>
-            <Button v-bind:content="`채점 현황`" v-bind:text-btn="true" v-on:click.native="GoStatus"></Button>
-            <Button v-bind:content="`순위`" v-bind:text-btn="true" v-on:click.native="GoRank"></Button>
-            <Button v-bind:content="this.$store.getters.getUserData.username" v-bind:text-btn="true" v-on:click.native="GoProfile"></Button>
+            <Button
+                v-bind:to="{name: 'ProblemList'}"
+                v-bind:content="`문제`"
+                v-bind:text-btn="true"></Button>
+            <Button
+                v-bind:to="{name: 'Status'}"
+                v-bind:content="`채점 현황`"
+                v-bind:text-btn="true"></Button>
+            <Button
+                v-bind:to="{name: 'Rank'}"
+                v-bind:content="`순위`"
+                v-bind:text-btn="true"></Button>
+            <Button
+                v-bind:to="{name: 'Profile', params: {username: this.$store.getters.getUserData.username}}"
+                v-bind:content="this.$store.getters.getUserData.username"
+                v-bind:text-btn="true"></Button>
             <Button v-bind:content="`로그아웃`" v-bind:text-btn="true" v-on:click.native="LOGOUT"></Button>
         </v-toolbar>
     </v-card>
@@ -43,22 +55,6 @@ export default {
         },
         GoHome() {
             if (this.$route.path !== '/') this.$router.push('/').catch(() => {
-            });
-        },
-        GoProblem() {
-            if (this.$route.path !== '/problem') this.$router.push('/problem').catch(() => {
-            });
-        },
-        GoStatus() {
-            if (this.$route.path !== '/status') this.$router.push('/status').catch(() => {
-            });
-        },
-        GoRank() {
-            if (this.$route.path !== '/rank') this.$router.push('/rank').catch(() => {
-            });
-        },
-        GoProfile() {
-            if (this.$route.path.indexOf('/profile') === -1) this.$router.push({name: 'Profile', params: {username: this.$store.getters.getUserData.username}}).catch(() => {
             });
         },
         LOGOUT() {

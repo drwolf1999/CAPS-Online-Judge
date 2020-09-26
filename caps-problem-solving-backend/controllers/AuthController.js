@@ -60,6 +60,7 @@ const AuthController = {
         bcrypt.genSalt(10, (error, salt) => {
             bcrypt.hash(req.body.password, salt, (error, hash) => {
                 if (error) {
+                    console.log(error);
                     return res.status(500).json({
                         hash: hash,
                         message: 'Hash Error',
@@ -74,12 +75,14 @@ const AuthController = {
                     });
                     auth.save()
                         .then(user => {
+                            console.log(user);
                             return res.status(201).json({
                                 message: 'Created user successfully',
                                 createdUser: user,
                             });
                         })
                         .catch(error => {
+                            console.log(error);
                             return res.status(500).json({
                                 error: error,
                             });
@@ -135,7 +138,8 @@ const AuthController = {
             if (!Profile) {
                 return res.status(404).json(null);
             }
-            if (Profile.profile_url === undefined || Profile.profile_url === null) {
+            console.log(Profile.profile_url);
+            if (!Profile.profile_url) {
                 return res.status(200).json(null);
             }
             const img = fs.readFileSync(Profile.profile_url, 'base64');

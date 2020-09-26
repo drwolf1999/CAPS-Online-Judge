@@ -198,13 +198,15 @@ const StatusController = {
                 });
             }
             if (result.judge_result === 1) await Problem.findOneAndUpdate({number: result.problem.number}, {$inc: {answers: 1}}).exec();
-            if (result.judge_result < 6) await UserProblemUpdate.ResultUpdate(result.username, result.problemNumber, result.judge_result, result.submit_time);
+            if (result.judge_result < 6) await UserProblemUpdate.ResultUpdate(result.username, result.problemNumber, result.submit_time, result.judge_result);
             //// broadcast all clients
             const io = req.app.io.of('/getStatus');
             console.log(io);
             io.emit('result', {
                 statusNumber: result.number,
                 judge_result: result.judge_result,
+                memory: result.memory,
+                time: result.time,
             });
             //// end broadcast
             res.status(200).json({

@@ -55,7 +55,6 @@
         },
         computed: {
             Language() {
-                console.log(LanguageConstants.Language[this.language].langType);
                 return LanguageConstants.Language;
             },
             Options() {

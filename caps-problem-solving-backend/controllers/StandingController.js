@@ -15,11 +15,11 @@ function Penalty(O) {
 const QueryBuilder = {
     Query: async (username, page) => {
         try {
-            const matchQuery = username === undefined || username === null ? {} : {username: username};
+            const matchQuery = username === undefined || username === null ? {} : {'user.username': username};
             let Users;
             let Group = {
                 _id: '$username',
-                username: {$first: '$username'},
+                user: {$first: '$user'},
                 answers: {$sum: '$judge_result'},
                 submits: {$sum: '$submit_count'},
                 problems: {
@@ -59,7 +59,26 @@ const QueryBuilder = {
                     }
                 };
             }
-            Users = await UserProblem.aggregate()
+            Users = await UserProblem.aggregate([
+                {
+                    $lookup: {
+                        from: 'auths',
+                        let: {"username": "$username"},
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {$eq: ["$username", "$$username"]},
+                                }
+                            },
+                            {$project: {"password": 0, "_id": 0, "permission": 0, "profile_url": 0}}
+                        ],
+                        as: 'user',
+                    }
+                },
+                {
+                    $unwind: '$user'
+                },
+            ])
                 .lookup({
                     from: 'problems',
                     localField: 'problemNumber',
@@ -74,7 +93,7 @@ const QueryBuilder = {
                     _id: false,
                     users: {
                         $push: {
-                            username: '$username',
+                            user: '$user',
                             score: '$score',
                             answers: '$answers',
                             submits: '$submits',
@@ -90,6 +109,7 @@ const QueryBuilder = {
                 .match(matchQuery)
                 .skip((page - 1) * 100)
                 .limit(100);
+            // console.log(Users);
             return Users;
         } catch (error) {
             console.log(error);
@@ -151,7 +171,7 @@ const StandingController = {
         try {
             await UserProblem.update({problemNumber: problemNumber}, {
                 $set: {
-                    judge_result: null,
+                    judge_result: 0,
                     notAC_count: 0,
                     penalty: 0,
                 }
@@ -182,7 +202,7 @@ const StandingController = {
                 await userProblem.save();
             } else {
                 userProblem.submit_count++;
-                userProblem.judge_result = userProblem.judge_result !== null && userProblem.judge_result === 1 ? 1 : judge_result;
+                userProblem.judge_result = (userProblem.judge_result !== null && userProblem.judge_result === 1) ? 1 : judge_result;
                 userProblem.notAC_count += judge_result !== 1;
                 userProblem.lastSubmit_time = new Date(userProblem.lastSubmit_time) < new Date(submissionTime) ? submissionTime : userProblem.lastSubmit_time;
                 userProblem.penalty = Math.max(userProblem.penalty, Penalty({

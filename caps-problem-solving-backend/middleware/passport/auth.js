@@ -3,6 +3,7 @@ const Secret = require('../Secret.js');
 module.exports = {
     isLoginSession: function (req, res, next) {
         try {
+            next();
             const decode = jwt.verify(req.headers['access-token'], Secret.JWT_TOKEN);
             req.userData = decode;
             next();

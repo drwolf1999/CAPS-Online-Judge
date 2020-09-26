@@ -19,10 +19,14 @@ router.get('/', function (req, res, next) {
 });
 
 router.use('/auth', authRouter);
-router.use('/problem', isLoginSession, problemRouter);
-router.use('/status', isLoginSession, statusRouter);
-router.use('/standing', isLoginSession, standingRouter);
-router.use('/profile', isLoginSession, profile);
+// router.use('/problem', isLoginSession, problemRouter);
+// router.use('/status', isLoginSession, statusRouter);
+// router.use('/standing', isLoginSession, standingRouter);
+// router.use('/profile', isLoginSession, profile);
+router.use('/problem', problemRouter);
+router.use('/status', statusRouter);
+router.use('/standing', standingRouter);
+router.use('/profile', profile);
 router.use('/for/judgement/secure', judgeRouter);
 
 const LocalStorage = require('../middleware/files/FileManger');

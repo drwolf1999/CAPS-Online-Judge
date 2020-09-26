@@ -27,13 +27,13 @@
                         </tr>
                         <tr v-else v-for="(problem) in Problems" v-bind:key="problem.number">
                             <td class="text-left">{{ problem.number }}</td>
-                            <td class="text-left"><a href="javascript:void(0)" @click="ProblemClick(problem.number)">{{ problem.name }}</a></td>
+                            <td class="text-left"><router-link :to="{name: 'ProblemView', params: {problemNumber: problem.number}}">{{ problem.name }}</router-link></td>
                             <td class="align-center">
                                 <v-chip-group>
                                     <v-chip
                                         v-if="problem.number in userJudgeResult && userJudgeResult[problem.number] !== -1"
                                         text-color="white"
-                                        :color="Color(userJudgeResult[problem.number])"
+                                        :color="Color(MyStanding.problems[problem.number])"
                                     >{{ Text(userJudgeResult[problem.number]) }}
                                     </v-chip>
                                 </v-chip-group>
@@ -63,6 +63,7 @@ import SubmitConstants from '@/helper/SubmitConstants';
 export default {
     name: 'ProblemList',
     mounted() {
+        this.$store.dispatch('fetchStanding', this.$store.getters.getUserData.username);
         this.fetchProblems();
         this.fetchProblemsCount();
     },
@@ -105,9 +106,6 @@ export default {
         onChangeQuery(value) {
             this.Query = value;
         },
-        ProblemClick(problemId) {
-            this.$router.push({name: 'ProblemView', params: {problemNumber: problemId}});
-        },
         Color(i) {
             return SubmitConstants.Result[i].color;
         },
@@ -124,6 +122,9 @@ export default {
         isAdmin() {
             return this.$store.getters.getUserData.permission >= 1;
         },
+        MyStanding() {
+            return this.$store.getters.getStanding;
+        }
     },
     components: {
         Input,

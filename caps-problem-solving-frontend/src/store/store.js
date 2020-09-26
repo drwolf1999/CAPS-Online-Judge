@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import RestAPI from '../constants/RestAPI';
+import StandingService from '../service/standing';
 
 Vue.use(Vuex);
 
@@ -30,6 +31,7 @@ export default new Vuex.Store({
         accessToken: axios.defaults.headers.common['Access-Token'],
         // 문제
         problem: null,
+        standing: null,
         /* 로그인 후 넘어갈 url */
         nextDestination: '/',
         lastSubmitLanguage: 0,
@@ -45,6 +47,9 @@ export default new Vuex.Store({
         getUserData(state) {
             return jwt.decode(state.accessToken);
         },
+        getStanding(state) {
+            return state.standing;
+        },
         getNextDestination(state) {
             return state.nextDestination;
         },
@@ -55,6 +60,14 @@ export default new Vuex.Store({
     mutations: {
         fetchProblem(state, problemData) {
             state.problem = problemData;
+        },
+        fetchStanding(state, standingData) {
+            let problems = {};
+            for (let i = standingData.problems.length - 1; i >= 0; i--) {
+                problems[standingData.problems[i].number] = standingData.problems[i].judge_result;
+            }
+            standingData.problems = problems;
+            state.standing = standingData;
         },
         // state 의 값 변경
         LOGIN(state, accessToken) {
@@ -87,6 +100,15 @@ export default new Vuex.Store({
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        fetchStanding(state, username) {
+            return StandingService.GetUser(username)
+                .then(response => {
+                    state.commit('fetchStanding', response.data.Standing);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
         },
         // state 값 변경 비동기
         LOGIN(state, loginData) {

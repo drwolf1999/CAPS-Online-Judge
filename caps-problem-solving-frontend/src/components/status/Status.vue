@@ -12,14 +12,17 @@
                     item-key="number"
                     loading-text="fetching....."
                 >
-                    <template v-slot:[`item.problem`]="{ item }">
-                        <a href="javascript:void(0);" @click="GoProblem(item.problem.number)">{{ item.problem.number }}</a>
-                    </template>
                     <template v-slot:[`item.user`]="{ item }">
                         <router-link
                             :to="{name: 'Profile', params: {username: item.user.username}}"
-                        >
-                            {{ item.user.username }}
+                        >{{ item.user.username }}
+                        </router-link>
+                    </template>
+                    <template v-slot:[`item.problem`]="{ item }">
+                        <router-link
+                            :style="LoginedUserStatusColor(item.problem.number)"
+                            :to="{name: 'ProblemView', params: {problemNumber: item.problem.number}}"
+                        >{{ item.problem.number }}
                         </router-link>
                     </template>
                     <template v-slot:[`item.judge_result`]="{ item }">
@@ -41,7 +44,9 @@
                         <div v-if="item.judge_result === 1">{{ item.time }} <span class="red--text">ms</span></div>
                     </template>
                     <template v-slot:[`item.language`]="{ item }">
-                        <div v-if="item.user.username === GetUserName"><a href="javascript:void(0);" @click="ViewCode(item.number)">{{ Language[item.language].langName }}</a></div>
+                        <div v-if="item.user.username === GetUserName">
+                            <router-link :to="{name: 'SubmitCodeView', params: {submitNumber: item.number}}">{{ Language[item.language].langName }}</router-link>
+                        </div>
                         <div v-else>{{ Language[item.language].langName }}</div>
                     </template>
                     <template v-slot:[`item.submit_time`]="{ item }">
@@ -77,12 +82,15 @@ export default {
             for (let i = this.Status.length - 1; i >= 0; i--) {
                 if (this.Status[i].number === data.statusNumber) {
                     this.Status[i].judge_result = data.judge_result;
+                    this.Status[i].memory = data.memory;
+                    this.Status[i].time = data.time;
                     break;
                 }
             }
         });
     },
     mounted() {
+        this.$store.dispatch('fetchStanding', this.$store.getters.getUserData.username);
         this.FetchStatusSize();
         this.FetchStatus(0);
     },
@@ -134,11 +142,9 @@ export default {
             if (this.IsLast) return;
             this.FetchStatus(this.LastSubmitNumber - 20);
         },
-        ViewCode(stateNumber) {
-            this.$router.push({name: 'SubmitCodeView', params: {submitNumber: stateNumber}});
-        },
-        GoProblem(problemNumber) {
-            this.$router.push({name: 'ProblemView', params: {problemNumber: problemNumber}});
+        LoginedUserStatusColor(problemNumber) {
+            if (problemNumber in this.$store.getters.getStanding.problems) return 'color: ' + this.Result[this.$store.getters.getStanding.problems[problemNumber]].color;
+            return '';
         },
     },
     computed: {

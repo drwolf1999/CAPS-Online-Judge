@@ -15,8 +15,11 @@
                             <th class="text-center">아이디</th>
                             <template v-if="IsContestMOD">
                                 <th class="text-center" v-for="(problem, index) in Problems" v-bind:key="problem.number">
-                                    <a style="text-decoration:none;" href="javascript:void(0);" @click="goProblem(problem.number)">{{ index + 1 | numberToAlphabet }}</a>
+                                    <router-link style="text-decoration:none;" :to="{name: 'ProblemView', params: {problemNumber: problem.number}}">{{ index + 1 | numberToAlphabet }}</router-link>
                                 </th>
+                            </template>
+                            <template v-else>
+                                <th class="text-center">상태 메시지</th>
                             </template>
                             <th class="text-center">점수{{ IsContestMOD ? '(+penalty)' : '' }}</th>
                             <template v-if="!IsContestMOD">
@@ -26,23 +29,30 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(user, index) in Users" v-bind:key="user.username">
+                        <tr v-for="(standing, index) in Standings" v-bind:key="standing.user.username">
                             <td>{{ index + 1 }}</td>
                             <td>
+                                <v-avatar v-if="!IsContestMOD" size="30" color="white">
+                                    <v-img v-if="standing.user.profileImage" v-bind:src="`data:image/png;base64,` + standing.user.profileImage"></v-img>
+                                    <v-icon v-else>mdi-account-circle</v-icon>
+                                </v-avatar>
                                 <router-link
-                                    :to="{name: 'Profile', params: {username: user.username}}">
-                                    {{ user.username }}
+                                    :to="{name: 'Profile', params: {username: standing.user.username}}">
+                                    {{ standing.user.username }}
                                 </router-link>
                             </td>
                             <template v-if="IsContestMOD">
-                                <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(user.problem, problem.number)">
-                                    {{ GetAttempt(user.problem, problem.number) }}
+                                <td v-for="problem in Problems" v-bind:key="problem.number" :class="GetColor(standing.problem, problem.number)">
+                                    {{ GetAttempt(standing.problem, problem.number) }}
                                 </td>
                             </template>
-                            <td>{{ user.score | realNumber }}</td>
+                            <template v-else>
+                                <td>{{ standing.user.statusMessage }}</td>
+                            </template>
+                            <td>{{ standing.score | realNumber }}</td>
                             <template v-if="!IsContestMOD">
-                                <td class="text-center">{{ user.answers }}</td>
-                                <td class="text-center">{{ user.submits }}</td>
+                                <td class="text-center">{{ standing.answers }}</td>
+                                <td class="text-center">{{ standing.submits }}</td>
                             </template>
                         </tr>
                         </tbody>
@@ -58,6 +68,7 @@ import ProblemService from '@/service/problem';
 import StandingService from '@/service/standing';
 import SubmitConstants from '@/helper/SubmitConstants';
 import Utility from "@/helper/Utility";
+import ProfileService from '@/service/profile';
 
 export default {
     name: 'Ranking',
@@ -68,9 +79,8 @@ export default {
     data: () => {
         return {
             Query: '',
-            Users: [],
             Problems: [],
-            Standing: [],
+            Standings: [],
             fetchingRanking: 2,
         };
     },
@@ -102,9 +112,6 @@ export default {
         onChangeQuery(value) {
             this.Query = value;
         },
-        goProblem(problemNumber) {
-            this.$router.push({name: 'ProblemView', params: {problemNumber: problemNumber}});
-        },
         fetchProblems() {
             this.fetchingRanking--;
             ProblemService.GetAllProblems()
@@ -119,9 +126,12 @@ export default {
         fetchStanding() {
             this.fetchingRanking--;
             StandingService.GetAll()
-                .then(response => {
-                    this.Standing = response.data.Standing;
-                    this.Users = response.data.Users;
+                .then(async (response) => {
+                    for (let i = response.data.Users.length - 1; i >= 0; i--) {
+                        const imageD = await ProfileService.ProfileImageUrl(response.data.Users[i].user.username);
+                        response.data.Users[i].user.profileImage = imageD.data;
+                    }
+                    this.Standings = response.data.Users;
                     this.fetchingRanking++;
                 })
                 .catch(error => {

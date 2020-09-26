@@ -26,8 +26,7 @@ let AuthSchema = new mongoose.Schema({
     },
     profile_url: {
         type: String,
-        required: true,
-        default: null,
+        default: '',
     },
     profile_type: {
         type: String,
