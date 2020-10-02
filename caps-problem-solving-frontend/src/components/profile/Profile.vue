@@ -20,7 +20,7 @@
                             ></v-list-item-avatar>
                             <v-list-item-avatar size="80" color="grey" v-else @click="$refs.profileImage.click()"></v-list-item-avatar>
                             <v-list-item-content class="text-left">
-                                <blockquote class="rainbow">{{ Profile.username }}</blockquote>
+                                <blockquote><Username v-bind:username="Profile.username" v-bind:rank="Standing.rank"></Username></blockquote>
                                 <v-list-item-title class="headline mb-1">{{ Profile.realName }}</v-list-item-title>
                                 <v-list-item-subtitle v-if="!ModifyMod">{{ Profile.statusMessage }}</v-list-item-subtitle>
                                 <v-list-item-subtitle v-else>
@@ -34,10 +34,10 @@
                                 <template v-slot:default>
                                     <thead>
                                     <tr>
-                                        <th class="text-left">랭킹</th>
-                                        <th class="text-left">포인트</th>
-                                        <th class="text-left">정답 수</th>
-                                        <th class="text-left">제출 수</th>
+                                        <th class="text-center">랭킹</th>
+                                        <th class="text-center">포인트</th>
+                                        <th class="text-center">정답 수</th>
+                                        <th class="text-center">제출 수</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -108,10 +108,11 @@ import ProfileService from '@/service/profile';
 import StandingService from '@/service/standing';
 import Button from "@/components/form/Button";
 import SubmitConstants from '@/helper/SubmitConstants';
+import Username from "@/components/form/Username";
 
 export default {
     name: 'Profile',
-    components: {Button},
+    components: {Button, Username},
     props: ['username'],
     mounted() {
         this.$store.dispatch('fetchStanding', this.$store.getters.getUserData.username);
@@ -212,11 +213,5 @@ tbody
 /deep/
 tr:hover:not(.v-data-table__expanded__content) {
     background: #ffffff !important;
-}
-
-.rainbow {
-    background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo);
-    -webkit-background-clip: text;
-    color: transparent;
 }
 </style>

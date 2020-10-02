@@ -12,8 +12,9 @@
                         <thead>
                         <tr>
                             <th class="text-left" style="width: 20%;">문제 번호</th>
-                            <th class="text-left" style="width: 40%;">제목</th>
-                            <th class="text-left" style="width: 20%;">정보</th>
+                            <th class="text-left" style="width: 35%;">제목</th>
+                            <th class="text-left" style="width: 15%;">정보</th>
+                            <th class="text-center" style="width: 10%;">포인트</th>
                             <th class="text-center" style="width: 10%;">맞은 사람</th>
                             <th class="text-center" style="width: 10%;">제출 수</th>
                         </tr>
@@ -27,7 +28,9 @@
                         </tr>
                         <tr v-else v-for="(problem) in Problems" v-bind:key="problem.number">
                             <td class="text-left">{{ problem.number }}</td>
-                            <td class="text-left"><router-link :to="{name: 'ProblemView', params: {problemNumber: problem.number}}">{{ problem.name }}</router-link></td>
+                            <td class="text-left">
+                                <router-link :to="{name: 'ProblemView', params: {problemNumber: problem.number}}">{{ problem.name }}</router-link>
+                            </td>
                             <td class="align-center">
                                 <v-chip-group>
                                     <v-chip
@@ -38,6 +41,7 @@
                                     </v-chip>
                                 </v-chip-group>
                             </td>
+                            <td>{{ problem.score }}</td>
                             <td>{{ problem.answers }}</td>
                             <td>{{ problem.submits }}</td>
                         </tr>

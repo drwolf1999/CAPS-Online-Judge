@@ -38,7 +38,8 @@
                                 </v-avatar>
                                 <router-link
                                     :to="{name: 'Profile', params: {username: standing.user.username}}">
-                                    {{ standing.user.username }}
+                                    <username v-if="!IsContestMOD" v-bind:username="standing.user.username" v-bind:rank="index"></username>
+                                    <template v-else>{{ standing.user.username }}</template>
                                 </router-link>
                             </td>
                             <template v-if="IsContestMOD">
@@ -69,9 +70,11 @@ import StandingService from '@/service/standing';
 import SubmitConstants from '@/helper/SubmitConstants';
 import Utility from "@/helper/Utility";
 import ProfileService from '@/service/profile';
+import Username from "@/components/form/Username";
 
 export default {
     name: 'Ranking',
+    components: {Username},
     mounted() {
         this.fetchProblems();
         this.fetchStanding();

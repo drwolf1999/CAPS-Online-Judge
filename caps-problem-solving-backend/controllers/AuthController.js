@@ -20,7 +20,7 @@ const AuthController = {
         Auth.findOne({username: req.body.username})
             .exec()
             .then(user => {
-                console.log(JSON.stringify(user));
+                // console.log(JSON.stringify(user));
                 if (!user) {
                     return res.status(401).json({
                         message: 'Auth Failed',
@@ -33,7 +33,7 @@ const AuthController = {
                         });
                     }
                     if (result) {
-                        const token = jwt.sign({username: user.username, user__id: user._id, permission: user.permission}, Secret.JWT_TOKEN, {expiresIn: "6h"});
+                        const token = jwt.sign({username: user.username, permission: user.permission}, Secret.JWT_TOKEN, {expiresIn: "6h"});
                         return res.status(200)
                             .header('Access-Token', token)
                             .json({
@@ -109,8 +109,8 @@ const AuthController = {
     },
     ProfileUpdate: async (req, res, next) => {
         try {
-            console.log(req.files);
-            console.log(req.body);
+            // console.log(req.files);
+            // console.log(req.body);
             let ARGS = {
                 permission: req.body.permission,
                 statusMessage: req.body.statusMessage,

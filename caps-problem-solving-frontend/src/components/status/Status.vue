@@ -15,7 +15,8 @@
                     <template v-slot:[`item.user`]="{ item }">
                         <router-link
                             :to="{name: 'Profile', params: {username: item.user.username}}"
-                        >{{ item.user.username }}
+                        >
+                            <Username v-bind:username="item.user.username"></Username>
                         </router-link>
                     </template>
                     <template v-slot:[`item.problem`]="{ item }">
@@ -73,9 +74,11 @@ import SubmitConstants from '@/helper/SubmitConstants';
 import StatusService from '@/service/status';
 import LanguageConstants from '@/helper/Language';
 import Utility from '@/helper/Utility';
+import Username from "@/components/form/Username";
 
 export default {
     name: 'Status',
+    components: {Username},
     created() {
         this.$statusSocket.emit('connect');
         this.$statusSocket.on('result', (data) => {

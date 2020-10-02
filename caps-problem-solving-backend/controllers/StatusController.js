@@ -23,7 +23,6 @@ const StatusController = {
             if (top === 0) top = await Status.getMaxNumber();
             const status = await Status.getAllStatus(top);
             const size = status.length;
-            console.log(size + ' ' + top);
             if (size === 21) {
                 return res.status(200).json({
                     Status: status.slice(0, size - 1),
