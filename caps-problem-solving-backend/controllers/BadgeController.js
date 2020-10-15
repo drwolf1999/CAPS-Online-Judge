@@ -5,7 +5,7 @@ const UserBadge = require('../models/UserBadge');
 const BadgeController = {
     All: async (req, res, next) => { // return all Badge
         try {
-            const badges = await Badge.getAllBadges().select('name number global');
+            const badges = await Badge.getAllBadges();
             return res.status(200).json({
                 Badge: badges,
             });

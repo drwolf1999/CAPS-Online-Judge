@@ -27,7 +27,7 @@ export default {
             sideNav: this.value,
             menus: [
                 {title: '재채점', name: 'Rejudge'},
-                // {title: 'About', icon: 'question_answer'},
+                {title: '업적', name: 'Badge'},
             ],
         };
     },

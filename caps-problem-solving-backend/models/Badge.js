@@ -30,6 +30,7 @@ BadgeSchema.statics.getBadge = function (badgeNumber) {
 
 BadgeSchema.statics.getAllBadges = function () {
     return this.find({}, null)
+        .select('name number global -id -_id -__v')
         .exec();
 };
 

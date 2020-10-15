@@ -4,6 +4,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import RestAPI from '../constants/RestAPI';
 import StandingService from '../service/standing';
+import BadgeService from '../service/badge';
 
 Vue.use(Vuex);
 
@@ -32,23 +33,27 @@ export default new Vuex.Store({
         // 문제
         problem: null,
         standing: null,
+        badges: null,
         /* 로그인 후 넘어갈 url */
         nextDestination: '/',
         lastSubmitLanguage: 0,
     },
     getters: {
-        getProblem(state) {
-            return state.problem;
-        },
         // state 값 가져오기
         isLogined(state) {
             return state.accessToken !== undefined && state.accessToken !== null;
+        },
+        getProblem(state) {
+            return state.problem;
         },
         getUserData(state) {
             return jwt.decode(state.accessToken);
         },
         getStanding(state) {
             return state.standing;
+        },
+        getBadge(state) {
+            return state.badges;
         },
         getNextDestination(state) {
             return state.nextDestination;
@@ -68,6 +73,9 @@ export default new Vuex.Store({
             }
             standingData.problems = problems;
             state.standing = standingData;
+        },
+        fetchBadge(state, badgeData) {
+            state.badges = badgeData;
         },
         // state 의 값 변경
         LOGIN(state, accessToken) {
@@ -98,7 +106,7 @@ export default new Vuex.Store({
                     state.commit('fetchProblem', response.data.Problem);
                 })
                 .catch(error => {
-                    console.log(error);
+                    // console.log(error);
                 });
         },
         fetchStanding(state, username) {
@@ -107,8 +115,15 @@ export default new Vuex.Store({
                     state.commit('fetchStanding', response.data.Standing);
                 })
                 .catch(error => {
-                    console.log(error);
+                    // console.log(error);
                 })
+        },
+        fetchBadge(state) {
+            return BadgeService.GetAll()
+                .then(response => {
+                    state.commit('fetchBadge', response.data.Badge);
+                })
+                .catch(error => {});
         },
         // state 값 변경 비동기
         LOGIN(state, loginData) {

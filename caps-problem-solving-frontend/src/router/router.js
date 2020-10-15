@@ -12,6 +12,7 @@ import Ranking from "@/components/ranking/Ranking.vue";
 import Testcase from "@/components/testcase/Testcase.vue";
 import Rejudge from "@/components/DangerZone/Rejudge.vue";
 import Profile from "@/components/profile/Profile";
+import Badge from "@/components/DangerZone/Badge";
 
 Vue.use(Router);
 
@@ -111,6 +112,12 @@ const index = new Router({
             path: '/admin/rejudge',
             name: 'Rejudge',
             component: Rejudge,
+            beforeEnter: requireAdmin(),
+        },
+        {
+            path: '/admin/badge',
+            name: 'Badge',
+            component: Badge,
             beforeEnter: requireAdmin(),
         },
     ]
