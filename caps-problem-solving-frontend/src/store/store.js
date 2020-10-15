@@ -112,7 +112,7 @@ export default new Vuex.Store({
         },
         // state 값 변경 비동기
         LOGIN(state, loginData) {
-            return axios.post(RestAPI.SERVER_DOMAIN + 'auth/login', loginData)
+            return axios.post(RestAPI.SERVER_DOMAIN + 'user/login', loginData)
                 .then((response) => {
                     state.commit('LOGIN', response.headers['access-token']);
                 })

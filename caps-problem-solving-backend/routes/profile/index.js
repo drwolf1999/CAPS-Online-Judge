@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const controller = require('../../controllers/AuthController');
+const controller = require('../../controllers/UserController');
 const multer = require('multer');
 const path = require('path');
 const { PROFILE_DIR } = require('../../constants/Path');

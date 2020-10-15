@@ -1,14 +1,14 @@
 const passport = require('passport');
 const LayoutArg = {layout: 'auth/layout'};
-const Auth = require('../models/Auth');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Secret = require('../middleware/Secret.js');
 const fs = require('fs');
 
-const AuthController = {
+const UserController = {
     Login: (req, res, next) => {
-        Auth.find({})
+        User.find({})
             .exec()
             .then(function (data) {
                 res.render('auth/login', LayoutArg);
@@ -17,7 +17,7 @@ const AuthController = {
     },
     DoLogin: (req, res, next) => {
         console.log(req.body.username + ' ' + req.body.password);
-        Auth.findOne({username: req.body.username})
+        User.findOne({username: req.body.username})
             .exec()
             .then(user => {
                 // console.log(JSON.stringify(user));
@@ -67,15 +67,15 @@ const AuthController = {
                         error: error,
                     });
                 } else {
-                    let auth = new Auth({
+                    let user = new User({
                         username: req.body.username,
                         password: hash,
                         realName: req.body.realName,
                         grade: req.body.grade,
                     });
-                    auth.save()
+                    user.save()
                         .then(user => {
-                            console.log(user);
+                            // console.log(user);
                             return res.status(201).json({
                                 message: 'Created user successfully',
                                 createdUser: user,
@@ -93,7 +93,7 @@ const AuthController = {
     },
     Profile: async (req, res, next) => {
         try {
-            const Profile = await Auth.findOne({username: req.params.username})
+            const Profile = await User.findOne({username: req.params.username})
                 .select('-password -profile_url -profile_type');
             return res.status(200).json({
                 Profile: Profile,
@@ -111,20 +111,26 @@ const AuthController = {
         try {
             // console.log(req.files);
             // console.log(req.body);
-            let ARGS = {
-                permission: req.body.permission,
-                statusMessage: req.body.statusMessage,
-            };
-            if (req.files.length > 0) {
-                ARGS.profile_url = req.files[0].path;
-                ARGS.profile_type = req.files[0].mimetype;
+            let Profile = await User.findOne({username: req.params.username});
+            console.log(Profile);
+            if (!Profile) {
+                return res.status(404).json({
+                    message: 'not found',
+                });
             }
-            const Profile = await Auth.findOneAndUpdate({username: req.params.username}, ARGS, {new: true});
+            Profile.permission = req.body.permission;
+            Profile.statusMessage = req.body.statusMessage;
+            if (req.files.length > 0) {
+                Profile.profile_url = req.files[0].path;
+                Profile.profile_type = req.files[0].mimetype;
+            }
+            Profile = await Profile.save();
             return res.status(201).json({
                 Profile: Profile,
                 message: 'success',
             });
         } catch (error) {
+            console.log(error);
             return res.status(500).json({
                 error: error,
                 message: 'fail...',
@@ -133,7 +139,7 @@ const AuthController = {
     },
     ProfileImage: async (req, res, next) => {
         try {
-            let Profile = await Auth.findOne({username: req.params.username})
+            let Profile = await User.findOne({username: req.params.username})
                 .select('-password');
             if (!Profile) {
                 return res.status(404).json(null);
@@ -144,7 +150,7 @@ const AuthController = {
             }
             const img = fs.readFileSync(Profile.profile_url, 'base64');
             res.status(200);
-            res.writeHead(200, {'Content-Type': Profile.profile_type });
+            res.writeHead(200, {'Content-Type': Profile.profile_type});
             res.end(img, 'binary');
         } catch (error) {
             console.log(error);
@@ -156,4 +162,4 @@ const AuthController = {
     },
 };
 
-module.exports = AuthController;
+module.exports = UserController;

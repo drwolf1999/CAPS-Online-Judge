@@ -1,5 +1,5 @@
 const UserProblem = require('../models/UserProblem');
-const Auth = require('../models/Auth');
+const User = require('../models/User');
 const CONTEST_START = new Date(process.env.CONTEST_TIME);
 
 const IsContestMOD = process.env.CONTEST_MOD === 'true';

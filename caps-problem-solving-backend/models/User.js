@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
  * real Name (name)
  * grade
  * */
-let AuthSchema = new mongoose.Schema({
+let UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -45,6 +45,6 @@ let AuthSchema = new mongoose.Schema({
     },
 });
 
-let Auth = mongoose.model('Auth', AuthSchema);
+let User = mongoose.model('User', UserSchema);
 
-module.exports = Auth;
+module.exports = User;

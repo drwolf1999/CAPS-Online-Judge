@@ -20,7 +20,9 @@
                             ></v-list-item-avatar>
                             <v-list-item-avatar size="80" color="grey" v-else @click="$refs.profileImage.click()"></v-list-item-avatar>
                             <v-list-item-content class="text-left">
-                                <blockquote><Username v-bind:username="Profile.username" v-bind:rank="Standing.rank"></Username></blockquote>
+                                <blockquote>
+                                    <Username v-bind:username="Profile.username" v-bind:rank="Standing.rank"></Username>
+                                </blockquote>
                                 <v-list-item-title class="headline mb-1">{{ Profile.realName }}</v-list-item-title>
                                 <v-list-item-subtitle v-if="!ModifyMod">{{ Profile.statusMessage }}</v-list-item-subtitle>
                                 <v-list-item-subtitle v-else>
@@ -65,14 +67,11 @@
                         <v-card-text>
                             <v-row justify="start">
                                 <v-col class="text-left">
-                                    <v-chip-group column>
-                                        <v-chip color="#00E676" text-color="white">1등팀</v-chip>
-                                        <v-chip color="#00E676" text-color="white">32기 대표</v-chip>
-                                        <v-chip color="#00E676" text-color="white">1회 우승팀</v-chip>
-                                        <v-chip color="#00E676" text-color="white">foo</v-chip>
-                                        <v-chip color="#00E676" text-color="white">bar</v-chip>
-                                        <v-chip color="#00E676" text-color="white">chi</v-chip>
+                                    <v-skeleton-loader v-if="!Badge" type="chip"></v-skeleton-loader>
+                                    <v-chip-group v-else-if="Badge.length > 0" column>
+                                        <v-chip v-for="badge in Badge" color="#00E676" text-color="white">{{ badge.name }}</v-chip>
                                     </v-chip-group>
+                                    <div v-else>업적이 없습니다.</div>
                                 </v-col>
                             </v-row>
                         </v-card-text>
@@ -105,6 +104,7 @@
 </template>
 <script>
 import ProfileService from '@/service/profile';
+import BadgeService from '@/service/badge';
 import StandingService from '@/service/standing';
 import Button from "@/components/form/Button";
 import SubmitConstants from '@/helper/SubmitConstants';
@@ -119,6 +119,7 @@ export default {
         this.FetchProfile();
         this.FetchStanding();
         this.FetchProfileImage();
+        this.FetchBadge();
     },
     data() {
         return {
@@ -127,6 +128,7 @@ export default {
             Profile: null,
             ProfileImage: null,
             Standing: null,
+            Badge: [],
         };
     },
     computed: {
@@ -176,6 +178,14 @@ export default {
                 .catch(() => {
                 });
         },
+        FetchBadge() {
+            BadgeService.GetByUser(this.username)
+                .then(response => {
+                    this.Badge = response.data.Badge;
+                })
+                .catch(() => {
+                });
+        },
         UpdateProfile() {
             this.IsUpdating = true;
             let formData = new FormData();
@@ -184,6 +194,7 @@ export default {
             formData.append('permission', this.Profile.permission);
             ProfileService.UpdateProfile(this.username, formData)
                 .then(response => {
+                    console.log(response.data.Profile);
                     this.Profile = response.data.Profile;
                     this.IsUpdating = false;
                     this.ModifyMod = false;
@@ -201,6 +212,7 @@ export default {
             this.FetchProfile();
             this.FetchStanding();
             this.FetchProfileImage();
+            this.FetchBadge();
         },
     }
 };
