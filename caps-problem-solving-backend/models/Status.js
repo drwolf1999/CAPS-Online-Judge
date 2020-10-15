@@ -20,7 +20,7 @@ let StatusSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        ref: 'Auth',
+        ref: 'User',
         required: true,
     },
     problemNumber: {
@@ -70,7 +70,7 @@ StatusSchema.virtual('problem', {
 });
 
 StatusSchema.virtual('user', {
-    ref: 'Auth',
+    ref: 'User',
     localField: 'username',
     foreignField: 'username',
     justOne: true // for many-to-1 relationships

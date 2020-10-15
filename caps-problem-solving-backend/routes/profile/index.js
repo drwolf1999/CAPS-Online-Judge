@@ -4,9 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const { PROFILE_DIR } = require('../../constants/Path');
 
-router.get('/:username', controller.Profile);
-
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, PROFILE_DIR);
@@ -30,7 +27,9 @@ const upload = multer({
     fileFilter: fileFilter
 }).array('image');
 
-router.post('/:username/update', upload, controller.ProfileUpdate);
+router.post('/update', upload, controller.ProfileUpdate);
+
+router.get('/:username', controller.Profile);
 router.get('/:username/image', controller.ProfileImage);
 
 module.exports = router;

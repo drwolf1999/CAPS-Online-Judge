@@ -45,7 +45,7 @@ UserProblemSchema.virtual('problem', {
 });
 
 UserProblemSchema.virtual('user', {
-    ref: 'Auth',
+    ref: 'User',
     localField: 'username',
     foreignField: 'username',
     justOne: true // for many-to-1 relationships

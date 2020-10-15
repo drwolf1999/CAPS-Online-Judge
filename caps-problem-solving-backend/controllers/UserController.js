@@ -94,7 +94,7 @@ const UserController = {
     Profile: async (req, res, next) => {
         try {
             const Profile = await User.findOne({username: req.params.username})
-                .select('-password -profile_url -profile_type');
+                .select('-password -profile_url -profile_type -__v -_id -id');
             return res.status(200).json({
                 Profile: Profile,
                 find: Profile !== null,
@@ -109,10 +109,7 @@ const UserController = {
     },
     ProfileUpdate: async (req, res, next) => {
         try {
-            // console.log(req.files);
-            // console.log(req.body);
-            let Profile = await User.findOne({username: req.params.username});
-            console.log(Profile);
+            let Profile = await User.findOne({username: req.userData.username});
             if (!Profile) {
                 return res.status(404).json({
                     message: 'not found',
@@ -124,7 +121,9 @@ const UserController = {
                 Profile.profile_url = req.files[0].path;
                 Profile.profile_type = req.files[0].mimetype;
             }
-            Profile = await Profile.save();
+            await Profile.save();
+            Profile = await User.findOne({username: req.userData.username})
+                .select('-password -profile_url -profile_type -__v -_id -id');
             return res.status(201).json({
                 Profile: Profile,
                 message: 'success',

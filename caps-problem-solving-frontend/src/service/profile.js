@@ -19,8 +19,9 @@ export default {
     },
     // Post
     UpdateProfile: async (username, data) => {
-        return await axios.post(RestAPI.SERVER_DOMAIN + 'profile/' + username + '/update', data, {
+        return await axios.post(RestAPI.SERVER_DOMAIN + 'profile/update', data, {
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'multipart/form-data'
             }
         })
