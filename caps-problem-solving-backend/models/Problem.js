@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 /**
  * In order
@@ -80,11 +81,9 @@ ProblemSchema.statics.getAllProblems = function () {
         .exec();
 };
 
-ProblemSchema.plugin(require('mongoose-auto-increment').plugin, {
-    model: 'Problem',
-    field: 'number',
-    startAt: 1000,
-    increment: 1,
+ProblemSchema.plugin(AutoIncrement, {
+    inc_field: 'number',
+    id: 'problem_number',
 });
 
 let Problem = mongoose.model('Problem', ProblemSchema);

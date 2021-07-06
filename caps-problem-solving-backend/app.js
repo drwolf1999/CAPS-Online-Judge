@@ -4,7 +4,6 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 const constantsSecret = require('./constants/Secret.js');
 
 require('./middleware/passport/passport')(passport);
@@ -37,7 +36,6 @@ mongoose.connect(constantsSecret.dbUrl, {
     .catch((error) => {
         console.log('error : ' + error);
     });
-autoIncrement.initialize(mongoose.connection);
 
 let app = express();
 

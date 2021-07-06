@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 /**
  * In order
@@ -79,11 +80,9 @@ StatusSchema.statics.getAllStatus = function (page) {
         .exec();
 };
 
-StatusSchema.plugin(require('mongoose-auto-increment').plugin, {
-    model: 'Status',
-    field: 'number',
-    startAt: 1000,
-    increment: 1,
+StatusSchema.plugin(AutoIncrement, {
+    inc_field: 'number',
+    id: 'status_number'
 });
 
 let Status = mongoose.model('Status', StatusSchema);
