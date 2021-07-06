@@ -16,7 +16,7 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 let StatusSchema = new mongoose.Schema({
     number: {
         type: Number,
-        required: true,
+        default: 1,
         unique: true,
     },
     username: {
@@ -105,6 +105,16 @@ StatusSchema.statics.getAllStatus = function (top) {
         .populate('problem')
         .exec();
 };
+
+StatusSchema.statics.getMaxNumber = async function () {
+    let infos = await this.find({}, null)
+        .sort('-number')
+        .limit(1);
+    if (infos.length === 1) {
+        return infos[0].number;
+    }
+    return 1000000;
+}
 
 StatusSchema.plugin(AutoIncrement, {
     inc_field: 'number',

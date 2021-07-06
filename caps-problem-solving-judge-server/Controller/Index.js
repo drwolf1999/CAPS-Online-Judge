@@ -12,11 +12,13 @@ const JudgeController = {
                 return false;
             });
         const ret = queue.data.status;
+        // console.log(ret)
         if (ret === null) return false;
         if (ret.length === 0) return false;
         if (ret[0] === null) return false;
         ret[0].judge_result = 6;
         await axios.post(RestAPI.SERVER_DOMAIN + RestAPI.JUDGE_ARG + 'updateResult', ret[0]);
+        // console.log(ret[0])
         return ret[0];
     },
     UpdateSubmission: async (data) => {

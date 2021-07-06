@@ -16,6 +16,7 @@ function parseJSON(value) {
 let ProblemSchema = new mongoose.Schema({
     number: {
         type: Number,
+        default: 1,
         unique: true,
     },
     name: {

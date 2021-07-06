@@ -1,4 +1,4 @@
 module.exports = {
-    SERVER_DOMAIN: 'http://61.82.95.102:3000/',
+    SERVER_DOMAIN: 'http://172.30.1.17:3030/',
     JUDGE_ARG: 'for/judgement/secure/',
 }

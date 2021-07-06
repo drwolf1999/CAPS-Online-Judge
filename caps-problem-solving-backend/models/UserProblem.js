@@ -18,6 +18,7 @@ let UserProblemSchema = new mongoose.Schema({
     judge_result: {
         type: Number,
         required: true,
+        default: 7,
     },
     submit_count: {
         type: Number,

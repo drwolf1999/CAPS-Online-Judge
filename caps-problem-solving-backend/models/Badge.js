@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 /**
  * In order
@@ -10,6 +11,7 @@ const mongoose = require('mongoose');
 let BadgeSchema = new mongoose.Schema({
     number: {
         type: Number,
+        default: 1,
         unique: true,
     },
     name: {
@@ -34,11 +36,9 @@ BadgeSchema.statics.getAllBadges = function () {
         .exec();
 };
 
-BadgeSchema.plugin(require('mongoose-auto-increment').plugin, {
-    model: 'Badge',
-    field: 'number',
-    startAt: 1,
-    increment: 1,
+BadgeSchema.plugin(AutoIncrement, {
+    inc_field: 'number',
+    id: 'badge_number'
 });
 
 const Badge = mongoose.model('Badge', BadgeSchema);

@@ -105,6 +105,7 @@ const StatusController = {
                     message: 'forbidden',
                 });
             let status = new Status({
+                judge_result: 7,
                 username: req.body.username,
                 problemNumber: req.body.problem,
                 code: req.body.code,
@@ -117,7 +118,7 @@ const StatusController = {
                 }
             })
                 .exec();
-            await UserProblemUpdate.ResultUpdate(req.body.username, req.body.problem, status.submit_time, null);
+            await UserProblemUpdate.ResultUpdate(req.body.username, req.body.problem, status.submit_time, 7);
             return res.status(200).json({
                 Status: status,
                 message: 'success',
@@ -153,30 +154,30 @@ const StatusController = {
         }
     },
     /////// for judgement
-    GetInQueue: (req, res, next) => {
-        Status.find()
-            .where('judge_result').equals('7')
-            .sort('number')
-            .populate('problem')
-            .limit(1)
-            .then(status => {
-                if (status === null || status === undefined || Object.keys(status).length === 0) {
-                    return res.status(200).json({
-                        status: null,
-                    });
-                } else {
-                    return res.status(200).json({
-                        status: status,
-                    });
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                return res.status(500).json({
-                    error: error,
-                    message: 'error',
+    GetInQueue: async (req, res, next) => {
+        try {
+            const status = await Status.find()
+                .where('judge_result').equals(7)
+                .sort('number')
+                .populate('problem')
+                .limit(1)
+            if (status === null || status === undefined || Object.keys(status).length === 0) {
+                return res.status(200).json({
+                    status: null,
                 });
+            } else {
+                return res.status(200).json({
+                    status: status,
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                error: error,
+                message: 'error',
             });
+        }
     },
     UpdateResult: async (req, res, next) => {
         const submitNumber = req.body.number;

@@ -10,8 +10,8 @@ RUN mkdir -p /var/log/nginx
 RUN mkdir -p /var/www/html
 
 # Copy the respective nginx configuration files
-COPY nginx_config /etc/nginx/nginx.conf
-COPY nginx_config /etc/nginx/conf.d/default.conf
+COPY nginx_config/nginx.conf /etc/nginx/nginx.conf
+COPY nginx_config/default.conf /etc/nginx/conf.d/default.conf
 
 # Set the directory we want to run the next commands for
 WORKDIR /tmp/nginx/vue-single-page-app
@@ -26,10 +26,10 @@ RUN npm install @vue/cli -g
 RUN npm install @vue/cli-service-global -g
 
 # Copy our source code into the container
-COPY ../caps-problem-solving-frontend1 .
+COPY . .
 
 # run webpack and the vue-loader
-RUN vue build
+RUN npm run build
 
 # copy the built app to our served directory
 RUN /bin/cp -r dist/* /var/www/html

@@ -145,7 +145,7 @@ const UserController = {
             }
             console.log(Profile.profile_url);
             if (!Profile.profile_url) {
-                return res.status(200).json(null);
+                return res.status(204).json(null);
             }
             const img = fs.readFileSync(Profile.profile_url, 'base64');
             res.status(200);

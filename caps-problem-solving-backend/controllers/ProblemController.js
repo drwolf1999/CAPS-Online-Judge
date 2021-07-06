@@ -1,6 +1,6 @@
 const Problem = require('../models/Problem');
 const {ShellHelper} = require('../middleware/Utility');
-const {UPLOAD_DIR} = require('../constants/Path');
+const {TC_DIR} = require('../constants/Path');
 const JudgeResult = require('./StandingController').GetByUserProblem;
 
 const ProblemController = {
@@ -75,7 +75,7 @@ const ProblemController = {
         })
         try {
             problem = await problem.save();
-            await ShellHelper.sh('mkdir -p ' + UPLOAD_DIR + '/' + problem.number);
+            await ShellHelper.sh('mkdir -p ' + TC_DIR + '/' + problem.number);
             res.status(200).json({
                 Problem: problem,
                 message: 'success',

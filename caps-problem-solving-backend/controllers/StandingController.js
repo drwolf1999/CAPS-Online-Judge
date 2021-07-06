@@ -62,7 +62,7 @@ const QueryBuilder = {
             Users = await UserProblem.aggregate([
                 {
                     $lookup: {
-                        from: 'auths',
+                        from: 'users',
                         let: {"username": "$username"},
                         pipeline: [
                             {
@@ -109,7 +109,7 @@ const QueryBuilder = {
                 .match(matchQuery)
                 .skip((page - 1) * 100)
                 .limit(100);
-            // console.log(Users);
+            console.log(Users);
             return Users;
         } catch (error) {
             console.log(error);
@@ -138,7 +138,8 @@ const StandingController = {
     },
     Get: async (req, res, next) => {
         try {
-            let Standing = await QueryBuilder.Query(req.params.username, 1);
+            const username = req.params.username;
+            let Standing = await QueryBuilder.Query(username, 1);
             if (Standing.length === 0) Standing = null;
             else Standing = Standing[0];
             return res.status(200).json({
@@ -171,7 +172,7 @@ const StandingController = {
         try {
             await UserProblem.update({problemNumber: problemNumber}, {
                 $set: {
-                    judge_result: 0,
+                    judge_result: 7,
                     notAC_count: 0,
                     penalty: 0,
                 }
@@ -184,7 +185,7 @@ const StandingController = {
     },
     ResultUpdate: async (username, problemNumber, submissionTime, judge_result) => {
         try {
-            if (judge_result === undefined) judge_result = null;
+            if (judge_result === undefined || judge_result === null) judge_result = 7;
             let userProblem = await UserProblem.findOne({username: username, problemNumber: problemNumber});
             if (!userProblem) {
                 userProblem = new UserProblem({

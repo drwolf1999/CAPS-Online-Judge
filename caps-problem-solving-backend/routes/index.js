@@ -25,6 +25,7 @@ router.use('/status', isLoginSession, statusRouter);
 router.use('/standing', isLoginSession, standingRouter);
 router.use('/profile', isLoginSession, profile);
 router.use('/badge'/*, isLoginSession*/, badgeRouter);
+router.use('/for/judgement/secure', judgeRouter);
 
 const LocalStorage = require('../middleware/files/FileManger');
 const path = require('path');
