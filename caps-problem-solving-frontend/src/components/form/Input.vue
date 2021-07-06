@@ -1,5 +1,5 @@
 <template>
-    <v-text-field :label="Label" v-model="InputData" v-on:input="onInput()"></v-text-field>
+    <v-text-field :label="label" v-model="InputData" v-on:input="onInput()"></v-text-field>
 </template>
 
 <script>
@@ -14,7 +14,7 @@
         },
         props: {
             label: String,
-            model: String,
+            model: {type: String, default: ''},
             readonly: {type: Boolean, default: false},
         },
         methods: {

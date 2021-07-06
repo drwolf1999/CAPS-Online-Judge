@@ -27,10 +27,10 @@ export default {
                 });
         });
     },
-    // DoLogin(data) {
-    //     return axios.post(RestAPI.SERVER_DOMAIN + 'auth/login', data)
-    //         .catch(error => {
-    //             console.log(error);
-    //         });
-    // },
+    async UpdateProblem(problemNumber, data) {
+        return await axios.post(RestAPI.SERVER_DOMAIN + 'problem/update/' + problemNumber, data)
+            .catch(error => {
+                console.log(error);
+            });
+    },
 };

@@ -5,8 +5,16 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const constantsSecret = require('./constants/Secret.js');
+const dotenv = require('dotenv');
 
 require('./middleware/passport/passport')(passport);
+
+dotenv.config({
+    path: path.resolve(
+        process.cwd(),
+        process.env.NODE_ENV === "production" ? ".env" : ".env.dev"
+    )
+});
 
 /**
  * DB 설정
@@ -41,7 +49,7 @@ let app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -64,9 +72,14 @@ app.use((req, res, next) => {
     next();
 });
 
-let router = require('./routes/index');
+const StatusSocket = require('./controllers/StatusController').GetBySocket;
+const io = require('socket.io');
 
-app.use('/', router);
+app.io = io();
+app.io.set('origins', '*:*');
+
+StatusSocket(app.io);
+app.use('/', require('./routes/index'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -52,9 +52,13 @@ const ShellHelper = {
     },
 };
 const JudgerHelper = {
-    judge: async (FILE, problem, input) => {
+    judge: async (FILE, problem, input, language) => {
         let time_limit = problem.time_limit;
         let memory_limit = problem.memory_limit;
+        if (language === 2) {
+            time_limit = time_limit * 2 + 1;
+            memory_limit = memory_limit * 2 + 32;
+        }
         let judger = '/usr/lib/judger/libjudger.so';
         judger += ' --max_cpu_time=' + (time_limit * 1000);
         judger += ' --max_memory=' + (memory_limit * 1000 * 1000); // byte to mb
@@ -84,12 +88,15 @@ const JudgerHelper = {
                 }
                 return 1;
                 break;
-            case 1:
+            case 1: // TLE
+                return RESULT.TLE.real;
             case 2:
-            case 3:
-            case 4:
-                return msg;
+                throw Error('undefined');
                 break;
+            case 3: // MLE
+                return RESULT.MLE.real;
+            case 4: // RE
+                return RESULT.RE.real;
             case 5:
                 return 8;
                 break;
@@ -101,7 +108,7 @@ module.exports = JudgerHelper;
 
 const Judger = {
     getJudgeResult: async (status_info) => {
-        console.log(status_info);
+        // console.log(status_info);
         const language = status_info.language;
         const user_code = status_info.code;
         let ret = {
@@ -116,18 +123,18 @@ const Judger = {
         let cmd;
         switch (language) {
             case 0:
-                FILE = FILE + '.cpp';
-                cmd = 'g++ -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=gnu++14 -DONLINE_JUDGE -DBOJ';
-                OBJ = OBJ + 'Main.o';
-                break;
-            case 1:
                 FILE = FILE + '.c';
                 cmd = 'gcc -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=c11 -DONLINE_JUDGE -DBOJ';
                 OBJ = OBJ + 'Main.o';
                 break;
+            case 1:
+                FILE = FILE + '.cpp';
+                cmd = 'g++ -o ' + WORK_PATH + 'Main.o ' + FILE + ' -O2 -Wall -lm -static -std=gnu++14 -DONLINE_JUDGE -DBOJ';
+                OBJ = OBJ + 'Main.o';
+                break;
             case 2:
                 FILE = FILE + '.3.py';
-                cmd = 'pyinstaller --onfile ' + FILE;
+                cmd = 'pyinstaller --onefile ' + FILE + ' --distpath ' + WORK_PATH;
                 OBJ = OBJ + 'Main.3';
                 break;
             default:
@@ -142,9 +149,9 @@ const Judger = {
             return ret;
         }
         await ShellHelper.sh('chmod +x ' + OBJ);
-        if (language === 2) {
-            await ShellHelper.sh('mv ' + WORK_PATH + 'dist/Main.3 ' + OBJ); // move
-        }
+        // if (language === 2) {
+        //     await ShellHelper.sh('mv ' + WORK_PATH + 'dist/Main.3 ' + OBJ); // move
+        // }
         let files = await fs.readdirSync(TC_PATH + status_info.problem.number);
         const working_dir = TC_PATH + status_info.problem.number + '/';
         let inputs = [], outputs = [];
@@ -169,7 +176,7 @@ const Judger = {
                 o++;
                 continue;
             }
-            let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i]));
+            let result = JSON.parse(await JudgerHelper.judge(OBJ, status_info.problem, inputs[i], language));
             // console.log(result);
             ret.judge_result = await JudgerHelper.Update(ret.judge_result, result.result, outputs[o]);
             if (ret.judge_result !== 1) break;
@@ -178,6 +185,7 @@ const Judger = {
             i++;
             o++;
         }
+        if ((inputs.length === 0 || outputs.length === 0) && ret.judge_result === 0) ret.judge_result = 1;
         return ret;
     },
 };

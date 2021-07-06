@@ -3,7 +3,7 @@
         <v-col cols="11">
             <v-card md-with-hover>
                 <v-card-title>
-                    문제 목록 ({{ ProblemCount }})
+                    문제 목록 ({{ Problems.length }})
                     <v-spacer></v-spacer>
                     <Input v-bind:data="Query" v-on:input="onChangeQuery"/>
                 </v-card-title>
@@ -11,22 +11,37 @@
                     <template v-slot:default>
                         <thead>
                         <tr>
-                            <th class="text-center">문제 번호</th>
-                            <th class="text-center">제목</th>
-                            <th class="text-center">맞은 사람</th>
-                            <th class="text-center">제출 수</th>
+                            <th class="text-left" style="width: 20%;">문제 번호</th>
+                            <th class="text-left" style="width: 35%;">제목</th>
+                            <th class="text-left" style="width: 15%;">정보</th>
+                            <th class="text-center" style="width: 10%;">포인트</th>
+                            <th class="text-center" style="width: 10%;">맞은 사람</th>
+                            <th class="text-center" style="width: 10%;">제출 수</th>
                         </tr>
                         </thead>
                         <tbody>
 
                         <tr v-if="fetchingProblems">
-                            <td colspan="4">
+                            <td colspan="5">
                                 <v-progress-linear indeterminate></v-progress-linear>
                             </td>
                         </tr>
                         <tr v-else v-for="(problem) in Problems" v-bind:key="problem.number">
-                            <td>{{ problem.number }}</td>
-                            <td><a href="javascript:void(0)" @click="ProblemClick(problem.number)">{{ problem.name }}</a></td>
+                            <td class="text-left">{{ problem.number }}</td>
+                            <td class="text-left">
+                                <router-link :to="{name: 'ProblemView', params: {problemNumber: problem.number}}">{{ problem.name }}</router-link>
+                            </td>
+                            <td class="align-center">
+                                <v-chip-group>
+                                    <v-chip
+                                        v-if="problem.number in userJudgeResult && userJudgeResult[problem.number] !== -1"
+                                        text-color="white"
+                                        :color="Color(MyStanding.problems[problem.number])"
+                                    >{{ Text(userJudgeResult[problem.number]) }}
+                                    </v-chip>
+                                </v-chip-group>
+                            </td>
+                            <td>{{ problem.score }}</td>
                             <td>{{ problem.answers }}</td>
                             <td>{{ problem.submits }}</td>
                         </tr>
@@ -36,7 +51,7 @@
             </v-card>
         </v-col>
         <v-col cols="11">
-            <router-link :to="'/problem/create'">
+            <router-link v-if="isAdmin" :to="'/problem/create'">
                 <Button v-bind:color="`primary`" v-bind:block="true" v-bind:content="`Add Problem`"></Button>
             </router-link>
         </v-col>
@@ -44,66 +59,80 @@
 </template>
 
 <script>
-    import Input from '@/components/form/Input.vue';
-    import Button from '@/components/form/Button';
-    import ProblemService from '@/service/problem.js';
+import Input from '@/components/form/Input.vue';
+import Button from '@/components/form/Button';
+import ProblemService from '@/service/problem.js';
+import SubmitConstants from '@/helper/SubmitConstants';
 
-    export default {
-        name: 'ProblemList',
-        mounted() {
-            this.fetchProblems();
-            this.fetchProblemsCount();
+export default {
+    name: 'ProblemList',
+    mounted() {
+        this.$store.dispatch('fetchStanding', this.$store.getters.getUserData.username);
+        this.fetchProblems();
+        this.fetchProblemsCount();
+    },
+    data() {
+        return {
+            Query: '',
+            fetchingProblems: false,
+            fetchingProblemsCount: false,
+            ProblemCount: 0,
+            Problems: [],
+            userJudgeResult: {},
+        };
+    },
+    methods: {
+        fetchProblems() {
+            this.fetchingProblems = true;
+            ProblemService.GetAllProblems()
+                .then(response => {
+                    this.Problems = response.data.Problems;
+                    this.userJudgeResult = response.data.userJudgeResult;
+                    this.fetchingProblems = false;
+                })
+                .catch(error => {
+                    this.$notify({
+                        title: '서버 오류 발생',
+                        text: '문제를 읽어들이는 과정에서 오류가 발생하였습니다.',
+                        type: 'error',
+                    });
+                    console.log(error);
+                })
         },
-        data() {
-            return {
-                Query: '',
-                fetchingProblems: false,
-                fetchingProblemsCount: false,
-                ProblemCount: 0,
-                Problems: []
-            };
+        fetchProblemsCount() {
+            this.fetchingProblems = true;
+            ProblemService.GetCountOfProblems()
+                .then(response => {
+                    this.fetchingProblemsCount = false;
+                    this.ProblemCount = response.data.count;
+                })
         },
-        methods: {
-            fetchProblems() {
-                this.fetchingProblems = true;
-                ProblemService.GetAllProblems()
-                    .then(response => {
-                        this.Problems = response.data.Problems;
-                        this.fetchingProblems = false;
-                    })
-                    .catch(error => {
-                        this.$notify({
-                            title: '서버 오류 발생',
-                            text: '문제를 읽어들이는 과정에서 오류가 발생하였습니다.',
-                            type: 'error',
-                        });
-                        console.log(error);
-                    })
-            },
-            fetchProblemsCount() {
-                this.fetchingProblems = true;
-                ProblemService.GetCountOfProblems()
-                    .then(response => {
-                        this.fetchingProblemsCount = false;
-                        this.ProblemCount = response.data.count;
-                    })
-            },
-            onChangeQuery(value) {
-                this.Query = value;
-            },
-            ProblemClick(problemId) {
-                const NextDestination = '/problem/view/' + problemId;
-                this.$router.push(NextDestination);
-            },
+        onChangeQuery(value) {
+            this.Query = value;
         },
-        watch: {
-            '$route.query'() {
-                this.fetchProblems();
-            }
+        Color(i) {
+            return SubmitConstants.Result[i].color;
         },
-        components: {
-            Input,
-            Button,
+        Text(i) {
+            return SubmitConstants.Result[i].name;
         }
-    }
+    },
+    watch: {
+        '$route.query'() {
+            this.fetchProblems();
+        }
+    },
+    computed: {
+        isAdmin() {
+            return this.$store.getters.getUserData.permission >= 1;
+        },
+        MyStanding() {
+            return this.$store.getters.getStanding;
+        }
+    },
+    components: {
+        Input,
+        Button,
+    },
+};
 </script>

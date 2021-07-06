@@ -5,7 +5,7 @@ import RestAPI from '../constants/RestAPI.js';
 export default {
     // Post
     DoRegister(data) {
-        return axios.post(RestAPI.SERVER_DOMAIN + 'auth/register', data)
+        return axios.post(RestAPI.SERVER_DOMAIN + 'user/register', data)
             .catch(error => {
                 console.log(error);
             });

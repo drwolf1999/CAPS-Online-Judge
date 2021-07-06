@@ -1,5 +1,5 @@
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-// const path = require( 'path' );
+const fs = require('fs');
 const Webpack = require('webpack');
 module.exports = {
     transpileDependencies: [
@@ -32,8 +32,21 @@ module.exports = {
         config.plugin('monaco-editor').use(MonacoWebpackPlugin, [
             {
                 // Languages are loaded on demand at runtime
-                languages: ['cpp']
+                languages: ['c', 'cpp', 'python']
             }
         ])
-    }
+    },
+    // devServer: {
+    //     public: 'https://192.168.0.25:8080/',
+    //     https: {
+    //         key: fs.readFileSync('/home/doyeop/SSL/server.key'),
+    //         cert: fs.readFileSync('/home/doyeop/SSL/server.crt'),
+    //     },
+    //     headers: {
+    //         'Access-Control-Allow-Origin': '*',
+    //         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+    //     },
+    //     hot: true,
+    //     disableHostCheck: true
+    // },
 };

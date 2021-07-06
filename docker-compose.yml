@@ -4,6 +4,9 @@ services:
     container_name: caps_oj_backend
     restart: always
     build: ./caps-problem-solving-backend
+    volumes:
+      - /Users/doyeopkim/data/testcase:/data/testcase
+      - /Users/doyeopkim/data/profile:/data/profile
     ports:
       - "3030:3000"
       - "8443:8443"
@@ -40,16 +43,19 @@ services:
     build: ./caps-problem-solving-judge-server
     volumes:
     - /Users/doyeopkim/data/testcase:/data/testcase
-    - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    - /sys/fs/cgroup:/sys/fs/cgroup:ro
     depends_on:
       - caps_oj_backend
     ports:
       - "3031:3000"
     links:
       - caps_oj_backend
+    ports:
+    - "2931:3000"
     cap_add:
       - SYS_ADMIN
       - SYS_RESOURCE
+
 #    cgroup_parent: m-executor-abcd
 #    capabilities:
 #      add: [SYS_ADMIN]

@@ -39,6 +39,10 @@ let ProblemSchema = new mongoose.Schema({
             return value / 1000.0;
         }
     },
+    score: {
+        type: Number,
+        default: 100,
+    },
     description: {
         type: String,
         get: parseJSON,
@@ -86,6 +90,6 @@ ProblemSchema.plugin(AutoIncrement, {
     id: 'problem_number',
 });
 
-let Problem = mongoose.model('Problem', ProblemSchema);
+const Problem = mongoose.model('Problem', ProblemSchema);
 
 module.exports = Problem;

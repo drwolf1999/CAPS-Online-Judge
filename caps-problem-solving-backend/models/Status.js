@@ -19,13 +19,13 @@ let StatusSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    user: {
-        type: mongoose.Schema.Types.ObjectID,
-        ref: 'Auth',
+    username: {
+        type: String,
+        ref: 'User',
         required: true,
     },
-    problem: {
-        type: mongoose.Schema.Types.ObjectID,
+    problemNumber: {
+        type: Number,
         ref: 'Problem',
         required: true,
     },
@@ -63,20 +63,46 @@ let StatusSchema = new mongoose.Schema({
     },
 }, {toJSON: {getters: true}});
 
-StatusSchema.statics.getStatus = function (problemNumber) {
-    return this.findOne({number: problemNumber})
+StatusSchema.virtual('problem', {
+    ref: 'Problem',
+    localField: 'problemNumber',
+    foreignField: 'number',
+    justOne: true // for many-to-1 relationships
+});
+
+StatusSchema.virtual('user', {
+    ref: 'User',
+    localField: 'username',
+    foreignField: 'username',
+    justOne: true // for many-to-1 relationships
+});
+
+StatusSchema.pre('save', async function (next) {
+    await this
+        .populate({
+            path: 'problem'
+        })
+        .populate({
+            path: 'user'
+        })
+        .execPopulate();
+    next();
+});
+
+StatusSchema.statics.getStatus = function (statusNumber) {
+    return this.findOne({number: statusNumber})
         .populate('user')
-        .populate('program')
+        .populate('problem')
         .exec();
 };
 
-StatusSchema.statics.getAllStatus = function (page) {
+StatusSchema.statics.getAllStatus = function (top) {
     return this.find({}, null)
-        .sort({'number': -1})
+        .sort('-number')
+        .where('number').lte(top)
+        .limit(21)
         .populate('user')
         .populate('problem')
-        // .skip((page - 1) * 10)
-        // .limit(10)
         .exec();
 };
 

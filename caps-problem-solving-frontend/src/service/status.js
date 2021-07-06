@@ -4,8 +4,14 @@ import RestAPI from '../constants/RestAPI.js';
 // auth 에 대한 Action 정의
 export default {
     // Get
-    GetAllStatus(Page) {
-        return axios.get(RestAPI.SERVER_DOMAIN + 'status/all/' + Page)
+    GetMaxNumber() {
+        return axios.get(RestAPI.SERVER_DOMAIN + 'status/maxNumber')
+            .catch(error => {
+                console.log(error);
+            });
+    },
+    GetAllStatus(Top) {
+        return axios.get(RestAPI.SERVER_DOMAIN + 'status/all/' + Top)
             .catch(error => {
                 console.log(error);
             });
@@ -28,10 +34,15 @@ export default {
                 });
         });
     },
+    Rejudge(data) {
+        return new Promise((resolve, reject) => {
+            axios.post(RestAPI.SERVER_DOMAIN + 'status/rejudge', data)
+                .then(response => {
+                    resolve(response.data)
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    },
 };
-
-/*
-router.get('/all/:page', controller.All);
-router.get('/get/:statusNumber', controller.Get);
-router.post('/create', controller.Create);
-* */
